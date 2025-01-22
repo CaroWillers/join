@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: login.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: login.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Checks if an email already exists in the user data.
+ * @param {string} email - Email address to check against the existing users.
+ * @returns {Promise&lt;boolean>} A promise that resolves to true if the email exists, otherwise false.
+ */
+async function checkIfEmailExists(email) {
+    let users = await loadUsers();
+    return users.some(user => user.email === email);
+}
+
+/**
+ * Attempts to log in the user by comparing the provided credentials with stored users.
+ * Sets local storage items if the credentials are valid, otherwise displays an error message.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function login() {
+    let email = document.getElementById('email').value;
+    let password = document.getElementById('password').value;
+    let rememberMe = document.getElementById('rememberCheckbox').checked;
+    let users = await loadUsers();
+    let user = users.find(u => u.email === email);
+
+    if (user &amp;&amp; user.password === password) {
+        setUserLogin(user);
+        await rememberPassword(email, user.password, rememberMe);
+        successfulLogin();
+    } else {
+        wrongPasswordMessage(); 
+    }
+}
+
+/**
+ * Displays an error message when the password is entered incorrectly.
+ */
+function wrongPasswordMessage() {
+    let passwordField = document.getElementById('password');
+    passwordField.classList.add('error');
+    document.getElementById('passwordError').style.display = 'block';
+}
+
+/**
+ * Clears the error state and message when the password field is focused.
+ */
+function clearPasswordError() {
+    let passwordField = document.getElementById('password');
+    passwordField.classList.remove('error');
+    document.getElementById('passwordError').style.display = 'none';
+    passwordField.value = '';  
+}
+
+/**
+ * Displays the login modal.
+ */
+function successfulLogin() {
+    let loginModal = document.getElementById("loginModal");
+    if (loginModal.style.display !== "block") {
+        loginModal.style.display = "block";
+
+        setTimeout(function() {
+            if (loginModal.style.display === "block") {
+                loginModal.style.display = "none";
+                window.location.href = '../index.html';
+                greetUser();
+            }
+        }, 2000);
+    }
+}
+
+/**
+ * Sets up the user session in localStorage with the user's information.
+ * @param {Object} user - The user object with at least a 'name' property.
+ */
+function setUserLogin(user) {
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('currentUserName', user.name);
+    localStorage.setItem('userType', 'regular');
+}
+
+/**
+ * Toggles the checkbox that states if the Privacy Policy was accepted or not and updatates the checkbox image.
+ * Toggles the state of a checkbox and updates the image icon to checked or not checked
+ * This function is used on login and signup pages to handle user interaction with the checkboxes,
+ * such as remembering passwords and accepting privacy policies. 
+* @param {HTMLElement} buttonElement - On click of this button, the state of the checkbox will be toggled.
+ */
+function toggleCheckbox(inputElement) {
+    if (inputElement.type === 'checkbox') {
+        let checkboxImage = inputElement.nextElementSibling.querySelector(".checkboxImage");
+        checkboxImage.src = inputElement.checked ? checkboxImage.getAttribute('data-checked') : checkboxImage.getAttribute('data-unchecked');
+    }
+}
+
+/**
+ * Handles the change event for the "Remember Me" checkbox.
+ * Fetches email from the DOM and toggles the remember password setting based on the checkbox state.
+ */
+function handleRememberMeChange() {
+    let email = document.getElementById('email').value;
+    let remember = document.getElementById('rememberCheckbox').checked;
+    rememberPassword(email, remember);
+}
+
+/**
+ * Updates the user's password in local storage if the "Remember Me" checkbox is checked.
+ * @param {string} email - User's email address to identify the user.
+ * @param {string} password - Password to be remembered.
+ * @param {boolean} remember - Flag to determine whether to remember or forget the password.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function rememberPassword(email, password, remember) {
+    let users = await loadUsers();
+    let user = users.find(u => u.email === email);
+    if (user) {
+        user.rememberMe = remember;
+        if (remember) {
+            user.password = password;
+        }
+        await setItem('users', JSON.stringify(users));
+    }
+}
+
+/**
+ * Toggles the visibility and state of a custom checkbox UI element.
+ * @param {HTMLElement} label - The label element associated with the checkbox.
+ */
+function toggleRememberMeCheckbox(inputElement) { 
+    let checkboxImage = inputElement.parentElement.querySelector('.checkboxImage');
+    checkboxImage.src = inputElement.checked ? checkboxImage.getAttribute('data-checked') : checkboxImage.getAttribute('data-unchecked');
+}
+
+/**
+ * Automatically fills in the password field and checks the "Remember Me" checkbox if the user's email is found and remembered.
+ * @async
+ */
+async function loadRememberedPassword() {
+    if (localStorage.getItem('userType') === 'guest') {
+        console.log('Gastbenutzer erkannt; Passwortwiederherstellung übersprungen.');
+        return; 
+    }
+    let inputEmail = document.getElementById('email').value.trim();
+    if (inputEmail.length === 0) return;
+
+    let users = await loadUsers();
+    let rememberedUser = users.find(u => u.rememberMe &amp;&amp; u.email === inputEmail);
+    if (rememberedUser) {
+        document.getElementById('password').value = rememberedUser.password;
+        document.getElementById('rememberCheckbox').checked = true; 
+    } else {
+        document.getElementById('password').value = '';
+        document.getElementById('rememberCheckbox').checked = false;
+    }
+}
+
+/**
+ * Loads remembered password if the email input field is present.
+ * This function is triggered when the DOM content is loaded.
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const emailElement = document.getElementById('email');
+    if (emailElement) {
+        loadRememberedPassword();
+    }
+});
+
+/**
+ * Displays a message in the message box based on the URL parameters.
+ * This function is triggered when the DOM content is loaded.
+ */
+document.addEventListener('DOMContentLoaded', function () { 
+    let urlParams = new URLSearchParams(window.location.search);
+    let msg = urlParams.get('msg');
+    if (msg) {
+        document.getElementById('msgBox').innerHTML = msg;
+    }
+});
+
+/**
+ * /**
+ * Sets up the session for a guest user and calls greetUser to display a welcome message.
+ */
+async function guestLogin() { 
+    setGuestLogin();
+    try { 
+        alert("Welcome, dear guest! Please be aware that your access is limited. To fully enjoy all the features of Join, consider registering using our sign-up form.");
+        greetUser();
+    } finally {
+        window.location.href = '../index.html';
+    }
+}
+
+/**
+ * Sets up the session for a guest user by storing necessary data in local storage.
+ */
+function setGuestLogin() {
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('currentUserName', 'Guest');
+    localStorage.setItem('userType', 'guest');
+}
+
+/**
+ * Displays a greeting message based on the current time of day to the logged-in user.
+ */
+function greetUser() {
+    let userName = localStorage.getItem('currentUserName');
+    let currentHour = new Date().getHours();
+    let greetingText = "Welcome";
+
+    if (currentHour &lt; 12) {
+        greetingText = "Good morning";
+    } else if (currentHour &lt; 18) {
+        greetingText = "Good afternoon";
+    } else {
+        greetingText = "Good evening";
+    }
+
+    let greetingElement = document.getElementById('greeting');
+    if (userName === 'Guest') {
+        greetingElement.textContent = `${greetingText}`;
+    } else if (userName !== 'Guest') {
+        let greetingElementUser = document.getElementById('greeting-user');
+        greetingElementUser.textContent = `${greetingText},`;
+        greetingElement.textContent = `${userName}`;
+        greetingElement.style.color = '#4589FF';
+    }
+    UserInitals(userName);
+}
+
+/**
+ * Displays user initials based on the provided user name on the board
+ */
+function UserInitals(userName) {
+    let userInitalsContainer = document.getElementById('user-initals');
+
+    let names = userName.split(' ');
+    let initials = names[0].substring(0, 1).toUpperCase();
+
+    if (names.length > 1) {
+        initials += names[names.length - 1].substring(0, 1).toUpperCase();
+    }
+    userInitalsContainer.innerText = initials;
+}
+
+/**
+ * Logs out the current user by clearing session-related data and redirecting to the login page.
+ */
+function logout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUserName');
+    localStorage.removeItem('userType');
+    localStorage.removeItem('rememberedEmail');
+    localStorage.removeItem('rememberedPassword');
+    localStorage.removeItem('rememberMe');
+
+    alert('Your logout was successful');
+    window.location.href = '../login.html';
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#CreatedPopUpOptions">CreatedPopUpOptions</a></li><li><a href="global.html#EditTemplate">EditTemplate</a></li><li><a href="global.html#NoMatchFound">NoMatchFound</a></li><li><a href="global.html#SubtaskStatus">SubtaskStatus</a></li><li><a href="global.html#TaskCadBigTemplate">TaskCadBigTemplate</a></li><li><a href="global.html#TaskTextInEdit">TaskTextInEdit</a></li><li><a href="global.html#TemplateGreetMobile">TemplateGreetMobile</a></li><li><a href="global.html#TemplateSubtaskProgressbar">TemplateSubtaskProgressbar</a></li><li><a href="global.html#Templates">Templates</a></li><li><a href="global.html#UpdateTaskInRemote">UpdateTaskInRemote</a></li><li><a href="global.html#UserInitals">UserInitals</a></li><li><a href="global.html#addContactButtonsCancelAndCreateButtonsHTMLTemplate">addContactButtonsCancelAndCreateButtonsHTMLTemplate</a></li><li><a href="global.html#addTaskInit">addTaskInit</a></li><li><a href="global.html#addTaskToBoard">addTaskToBoard</a></li><li><a href="global.html#addUser">addUser</a></li><li><a href="global.html#allowDrop">allowDrop</a></li><li><a href="global.html#assignedInitals">assignedInitals</a></li><li><a href="global.html#assingContact">assingContact</a></li><li><a href="global.html#bigCard">bigCard</a></li><li><a href="global.html#bigCardAssigned">bigCardAssigned</a></li><li><a href="global.html#bigCardAssignedTemplate">bigCardAssignedTemplate</a></li><li><a href="global.html#bigCardSubtaskTemplate">bigCardSubtaskTemplate</a></li><li><a href="global.html#bigCardSubtasks">bigCardSubtasks</a></li><li><a href="global.html#bigCardSubtasksCheck">bigCardSubtasksCheck</a></li><li><a href="global.html#boardPlace">boardPlace</a></li><li><a href="global.html#boardPopupAddTask">boardPopupAddTask</a></li><li><a href="global.html#boardPopupAddTaskWindow">boardPopupAddTaskWindow</a></li><li><a href="global.html#boardTaskNumber">boardTaskNumber</a></li><li><a href="global.html#buildTemplateForArrayInput">buildTemplateForArrayInput</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#cardTemplate">cardTemplate</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#changeBackCheckBoxStyle">changeBackCheckBoxStyle</a></li><li><a href="global.html#changeCheckBoxStyle">changeCheckBoxStyle</a></li><li><a href="global.html#changeContactButtonColorAsClicked">changeContactButtonColorAsClicked</a></li><li><a href="global.html#changeContactButtonEmailColorToWhite">changeContactButtonEmailColorToWhite</a></li><li><a href="global.html#changeLockIcon">changeLockIcon</a></li><li><a href="global.html#changeNavigation">changeNavigation</a></li><li><a href="global.html#changeNavigationAddTask">changeNavigationAddTask</a></li><li><a href="global.html#changeNavigationHighlightSummary">changeNavigationHighlightSummary</a></li><li><a href="global.html#changeNavigationPrivacyPolicy">changeNavigationPrivacyPolicy</a></li><li><a href="global.html#changePriorityColor">changePriorityColor</a></li><li><a href="global.html#checkAssignContact">checkAssignContact</a></li><li><a href="global.html#checkCards">checkCards</a></li><li><a href="global.html#checkErrors">checkErrors</a></li><li><a href="global.html#checkForDuplicateEmail">checkForDuplicateEmail</a></li><li><a href="global.html#checkIfEmailExists">checkIfEmailExists</a></li><li><a href="global.html#checkIfUserIsAddedAsContact">checkIfUserIsAddedAsContact</a></li><li><a href="global.html#checkInputValue">checkInputValue</a></li><li><a href="global.html#checkPasswordStrength">checkPasswordStrength</a></li><li><a href="global.html#checkPrivacyPolicy">checkPrivacyPolicy</a></li><li><a href="global.html#clearAddContactForm">clearAddContactForm</a></li><li><a href="global.html#clearPasswordError">clearPasswordError</a></li><li><a href="global.html#clearSubtaskInputField">clearSubtaskInputField</a></li><li><a href="global.html#clickedButtonEmailColors">clickedButtonEmailColors</a></li><li><a href="global.html#clickedButtons">clickedButtons</a></li><li><a href="global.html#clickedLegalPart">clickedLegalPart</a></li><li><a href="global.html#closeAssignToDropdown">closeAssignToDropdown</a></li><li><a href="global.html#closeCard">closeCard</a></li><li><a href="global.html#closeContactInfo">closeContactInfo</a></li><li><a href="global.html#closeDropdowenTask">closeDropdowenTask</a></li><li><a href="global.html#closeDropdown">closeDropdown</a></li><li><a href="global.html#closeTaskCategoryDropdown">closeTaskCategoryDropdown</a></li><li><a href="global.html#createCardObject">createCardObject</a></li><li><a href="global.html#createCategories">createCategories</a></li><li><a href="global.html#createContact">createContact</a></li><li><a href="global.html#createNewContactDataSet">createNewContactDataSet</a></li><li><a href="global.html#createTask">createTask</a></li><li><a href="global.html#createUserAsContact">createUserAsContact</a></li><li><a href="global.html#currentDraggedElement">currentDraggedElement</a></li><li><a href="global.html#deleteContact">deleteContact</a></li><li><a href="global.html#deleteCreatedSubtask">deleteCreatedSubtask</a></li><li><a href="global.html#deleteTask">deleteTask</a></li><li><a href="global.html#deleteUneditTask">deleteUneditTask</a></li><li><a href="global.html#displayClosestDueDate">displayClosestDueDate</a></li><li><a href="global.html#doNotClose">doNotClose</a></li><li><a href="global.html#doneCardUpdate">doneCardUpdate</a></li><li><a href="global.html#doneNumber">doneNumber</a></li><li><a href="global.html#drop">drop</a></li><li><a href="global.html#dropMobile">dropMobile</a></li><li><a href="global.html#dropdowenTask">dropdowenTask</a></li><li><a href="global.html#dropdownHelp">dropdownHelp</a></li><li><a href="global.html#dropdownLegalNotice">dropdownLegalNotice</a></li><li><a href="global.html#dropdownPrivacyPolicy">dropdownPrivacyPolicy</a></li><li><a href="global.html#editContactDeleteAndSaveButtonLayoutHTMLTemplate">editContactDeleteAndSaveButtonLayoutHTMLTemplate</a></li><li><a href="global.html#editCreatedSubtask">editCreatedSubtask</a></li><li><a href="global.html#editTask">editTask</a></li><li><a href="global.html#editTaskDone">editTaskDone</a></li><li><a href="global.html#emptyArrays">emptyArrays</a></li><li><a href="global.html#errorMessageIfEmptyCategory">errorMessageIfEmptyCategory</a></li><li><a href="global.html#errorMessageIfEmptyDueDate">errorMessageIfEmptyDueDate</a></li><li><a href="global.html#errorMessageIfEmptyTitle">errorMessageIfEmptyTitle</a></li><li><a href="global.html#feedbackCardUpdate">feedbackCardUpdate</a></li><li><a href="global.html#feedbackNumber">feedbackNumber</a></li><li><a href="global.html#formatContactName">formatContactName</a></li><li><a href="global.html#formatDueDate">formatDueDate</a></li><li><a href="global.html#getCategoryColor">getCategoryColor</a></li><li><a href="global.html#getContactData">getContactData</a></li><li><a href="global.html#getContactRelatedInfo">getContactRelatedInfo</a></li><li><a href="global.html#getIndexByNameSurname">getIndexByNameSurname</a></li><li><a href="global.html#getOldestOverdueDate">getOldestOverdueDate</a></li><li><a href="global.html#getPriorityImagePath">getPriorityImagePath</a></li><li><a href="global.html#getQueryParam">getQueryParam</a></li><li><a href="global.html#getSelectedContact">getSelectedContact</a></li><li><a href="global.html#getTaskData">getTaskData</a></li><li><a href="global.html#giveId">giveId</a></li><li><a href="global.html#goBack">goBack</a></li><li><a href="global.html#greetUser">greetUser</a></li><li><a href="global.html#greetUserMobile">greetUserMobile</a></li><li><a href="global.html#guestLogin">guestLogin</a></li><li><a href="global.html#handleContactAssignment">handleContactAssignment</a></li><li><a href="global.html#handleRememberMeChange">handleRememberMeChange</a></li><li><a href="global.html#hideAddContactCard">hideAddContactCard</a></li><li><a href="global.html#hideContactEditDeleteMenu">hideContactEditDeleteMenu</a></li><li><a href="global.html#highlightCreatedContact">highlightCreatedContact</a></li><li><a href="global.html#highlightErrorMessage">highlightErrorMessage</a></li><li><a href="global.html#includeAddTask">includeAddTask</a></li><li><a href="global.html#includeHTML">includeHTML</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initContacts">initContacts</a></li><li><a href="global.html#insertAnimation">insertAnimation</a></li><li><a href="global.html#isAssignedEdit">isAssignedEdit</a></li><li><a href="global.html#legalNoticeHiglite">legalNoticeHiglite</a></li><li><a href="global.html#loadAddTasks">loadAddTasks</a></li><li><a href="global.html#loadBoard">loadBoard</a></li><li><a href="global.html#loadContacts">loadContacts</a></li><li><a href="global.html#loadRememberedPassword">loadRememberedPassword</a></li><li><a href="global.html#loadRemoteContactsOfLoggedInUser">loadRemoteContactsOfLoggedInUser</a></li><li><a href="global.html#loadTasks">loadTasks</a></li><li><a href="global.html#loadUsers">loadUsers</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#lowPriorityButtonStylingWhenClicked">lowPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#matchingCategoryCheck">matchingCategoryCheck</a></li><li><a href="global.html#mediumPriorityButtonStylingWhenClicked">mediumPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#mobileGreeting">mobileGreeting</a></li><li><a href="global.html#navigateTo">navigateTo</a></li><li><a href="global.html#navigationClick">navigationClick</a></li><li><a href="global.html#navigationClickImg">navigationClickImg</a></li><li><a href="global.html#newContactDataSetForArray">newContactDataSetForArray</a></li><li><a href="global.html#openAssignToDropdown">openAssignToDropdown</a></li><li><a href="global.html#openContactInfo">openContactInfo</a></li><li><a href="global.html#openContactInfoHTMLTemplate">openContactInfoHTMLTemplate</a></li><li><a href="global.html#openCreatedSubtaskBox">openCreatedSubtaskBox</a></li><li><a href="global.html#openDropdown">openDropdown</a></li><li><a href="global.html#openTaskCategoryDropdown">openTaskCategoryDropdown</a></li><li><a href="global.html#outputDeadlineText">outputDeadlineText</a></li><li><a href="global.html#outputDueDate">outputDueDate</a></li><li><a href="global.html#priorityEdit">priorityEdit</a></li><li><a href="global.html#priorityImgCheck">priorityImgCheck</a></li><li><a href="global.html#privacyPolicyHighlight">privacyPolicyHighlight</a></li><li><a href="global.html#progressCardUpdate">progressCardUpdate</a></li><li><a href="global.html#progressNumber">progressNumber</a></li><li><a href="global.html#progressbarCompetedRate">progressbarCompetedRate</a></li><li><a href="global.html#redesignAddContactCardToEditContactCard">redesignAddContactCardToEditContactCard</a></li><li><a href="global.html#rememberPassword">rememberPassword</a></li><li><a href="global.html#removeClickedLegalPart">removeClickedLegalPart</a></li><li><a href="global.html#removeNavHighlightLegalPartOnDropdown">removeNavHighlightLegalPartOnDropdown</a></li><li><a href="global.html#removeNavHighlightOnDropdown">removeNavHighlightOnDropdown</a></li><li><a href="global.html#removeNavigationClick">removeNavigationClick</a></li><li><a href="global.html#renderAddContactLayout">renderAddContactLayout</a></li><li><a href="global.html#renderAllContacts">renderAllContacts</a></li><li><a href="global.html#renderContactCategory">renderContactCategory</a></li><li><a href="global.html#renderContactCategoryAndEachContact">renderContactCategoryAndEachContact</a></li><li><a href="global.html#renderContactList">renderContactList</a></li><li><a href="global.html#renderEachContact">renderEachContact</a></li><li><a href="global.html#renderFilteredContacts">renderFilteredContacts</a></li><li><a href="global.html#resetAddTaskForm">resetAddTaskForm</a></li><li><a href="global.html#resetContactButtonColor">resetContactButtonColor</a></li><li><a href="global.html#resetContactButtonEmailColor">resetContactButtonEmailColor</a></li><li><a href="global.html#resetCreateTaskFormInputs">resetCreateTaskFormInputs</a></li><li><a href="global.html#resetLastClickedContactButtonColor">resetLastClickedContactButtonColor</a></li><li><a href="global.html#resetLastClickedContactButtonEmailColor">resetLastClickedContactButtonEmailColor</a></li><li><a href="global.html#resetNavigationItems">resetNavigationItems</a></li><li><a href="global.html#resetOtherPriorityButtonStyles">resetOtherPriorityButtonStyles</a></li><li><a href="global.html#saveEditSubtaskInput">saveEditSubtaskInput</a></li><li><a href="global.html#saveNewUser">saveNewUser</a></li><li><a href="global.html#saveSubtaskInput">saveSubtaskInput</a></li><li><a href="global.html#scrollDown">scrollDown</a></li><li><a href="global.html#scrollToAnchor">scrollToAnchor</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchContactToAssign">searchContactToAssign</a></li><li><a href="global.html#selectTaskCategory">selectTaskCategory</a></li><li><a href="global.html#separateCards">separateCards</a></li><li><a href="global.html#setButtonColorAsClicked">setButtonColorAsClicked</a></li><li><a href="global.html#setEmailColorAsClicked">setEmailColorAsClicked</a></li><li><a href="global.html#setGuestLogin">setGuestLogin</a></li><li><a href="global.html#setUserLogin">setUserLogin</a></li><li><a href="global.html#showAddContactCard">showAddContactCard</a></li><li><a href="global.html#showAvatarsOfSelectedContacts">showAvatarsOfSelectedContacts</a></li><li><a href="global.html#showContactCreatedPopUp">showContactCreatedPopUp</a></li><li><a href="global.html#showContactEditDeleteMenu">showContactEditDeleteMenu</a></li><li><a href="global.html#showCurrentContactDetails">showCurrentContactDetails</a></li><li><a href="global.html#showEditAndDeleteMenuOnMobile">showEditAndDeleteMenuOnMobile</a></li><li><a href="global.html#showEditContact">showEditContact</a></li><li><a href="global.html#showTaskCreatedPopUp">showTaskCreatedPopUp</a></li><li><a href="global.html#showTaskCreatedPopUpBoard">showTaskCreatedPopUpBoard</a></li><li><a href="global.html#sortByFirstName">sortByFirstName</a></li><li><a href="global.html#sortUpcomingCards">sortUpcomingCards</a></li><li><a href="global.html#startAnimation">startAnimation</a></li><li><a href="global.html#startDragging">startDragging</a></li><li><a href="global.html#subtaskCompleted">subtaskCompleted</a></li><li><a href="global.html#subtaskEdit">subtaskEdit</a></li><li><a href="global.html#subtaskNotCompleted">subtaskNotCompleted</a></li><li><a href="global.html#successfulLogin">successfulLogin</a></li><li><a href="global.html#successfulSignup">successfulSignup</a></li><li><a href="global.html#summaryLoad">summaryLoad</a></li><li><a href="global.html#summaryLoadNumbers">summaryLoadNumbers</a></li><li><a href="global.html#templateOkBtn">templateOkBtn</a></li><li><a href="global.html#todoCardUpdate">todoCardUpdate</a></li><li><a href="global.html#todoNumber">todoNumber</a></li><li><a href="global.html#toggleAssignToDropdown">toggleAssignToDropdown</a></li><li><a href="global.html#toggleCheckbox">toggleCheckbox</a></li><li><a href="global.html#toggleContactButtonColor">toggleContactButtonColor</a></li><li><a href="global.html#toggleContactButtonEmailColor">toggleContactButtonEmailColor</a></li><li><a href="global.html#toggleIndex">toggleIndex</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePrivacyPolicyCheckbox">togglePrivacyPolicyCheckbox</a></li><li><a href="global.html#toggleRememberMeCheckbox">toggleRememberMeCheckbox</a></li><li><a href="global.html#toggleSelectTaskCategoryDropdown">toggleSelectTaskCategoryDropdown</a></li><li><a href="global.html#uncheckAssignContact">uncheckAssignContact</a></li><li><a href="global.html#unclickCreatedContact">unclickCreatedContact</a></li><li><a href="global.html#updateCards">updateCards</a></li><li><a href="global.html#updateContact">updateContact</a></li><li><a href="global.html#updateDueDateContainers">updateDueDateContainers</a></li><li><a href="global.html#updateUserContactsInRemote">updateUserContactsInRemote</a></li><li><a href="global.html#updateUserContactsInRemoteAfterRegistration">updateUserContactsInRemoteAfterRegistration</a></li><li><a href="global.html#urgentButtonColor">urgentButtonColor</a></li><li><a href="global.html#urgentNumber">urgentNumber</a></li><li><a href="global.html#urgentPriorityButtonStylingWhenClicked">urgentPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#validateConfirmedPassword">validateConfirmedPassword</a></li><li><a href="global.html#validateEmailAddress">validateEmailAddress</a></li><li><a href="global.html#validateFormFields">validateFormFields</a></li><li><a href="global.html#validateTaskData">validateTaskData</a></li><li><a href="global.html#wrongPasswordMessage">wrongPasswordMessage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue May 07 2024 10:05:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: templates.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: templates.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>let users = [
+    {
+        "name": "Guest",
+        "email": "guest@guestmail.com",
+        "userContacts": [
+            {
+                "name": "Anton",
+                "surname": "Mayer",
+                "initials": "AM",
+                "avatarColor": "rgb(255,122,0)",
+                "email": "anton@gmail.com",
+                "phone": "+49 1111 111 11 1",
+                "category": "A"
+            },
+            {
+                "name": "Albert",
+                "surname": "Gerdes",
+                "initials": "AG",
+                "avatarColor": "rgb(255,70,70)",
+                "email": "albert@gmail.com",
+                "phone": "+49 2222 222 22 2",
+                "category": "A"
+            },
+            {
+                "name": "Aaron",
+                "surname": "Brier",
+                "initials": "AB",
+                "avatarColor": "rgb(147,39,255)",
+                "email": "aaron@gmail.com",
+                "phone": "+49 3333 333 33 3",
+                "category": "A"
+            },
+            {
+                "name": "Britta",
+                "surname": "Zielke",
+                "initials": "BZ",
+                "avatarColor": "rgb(110,82,255)",
+                "email": "b.zielke@gmail.com",
+                "phone": "+49 4444 444 44 4",
+                "category": "B"
+            },
+            {
+                "name": "Carsten",
+                "surname": "Schmidt",
+                "initials": "CS",
+                "avatarColor": "rgb(252,113,255)",
+                "email": "carsten.schmidt@gmail.com",
+                "phone": "+49 5555 555 55 5",
+                "category": "C"
+            },
+            {
+                "name": "Bernt",
+                "surname": "Saathoff",
+                "initials": "BS",
+                "avatarColor": "rgb(255,187,43)",
+                "email": "bernt.s@gmail.com",
+                "phone": "+49 6666 666 66 6",
+                "category": "B"
+            },
+            {
+                "name": "Caroline",
+                "surname": "Tabeling",
+                "initials": "CT",
+                "avatarColor": "rgb(31,215,193)",
+                "email": "caroline@gmail.com",
+                "phone": "+49 7777 777 77 7",
+                "category": "C"
+            },
+            {
+                "name": "Diana",
+                "surname": "König",
+                "initials": "DK",
+                "avatarColor": "rgb(255,70,70)",
+                "email": "diana.koenig@gmail.com",
+                "phone": "+49 8888 888 88 8",
+                "category": "D"
+            },
+            {
+                "name": "Erik",
+                "surname": "Wagner",
+                "initials": "EW",
+                "avatarColor": "rgb(255,0,191)",
+                "email": "erik.wagner@gmail.com",
+                "phone": "+49 9999 999 99 9",
+                "category": "E"
+            },
+            {
+                "name": "Fiona",
+                "surname": "Müller",
+                "initials": "FM",
+                "avatarColor": "rgb(255,122,0)",
+                "email": "fiona.mueller@gmail.com",
+                "phone": "+49 1010 101 01 0",
+                "category": "F"
+            }
+        ]
+    }
+];
+
+/**
+ * Generates the HTML structure for a single card on the board.
+ * @param {object} card The card object containing details to populate the template.
+ * @returns {string} The HTML string representing a card on the board.
+ */
+function cardTemplate(card) {
+
+    return `
+    &lt;div draggable="true" onclick="bigCard(${card.id})" ondragstart="startDragging(${card.id})" class="board-card-small" >
+        &lt;div style="background-color:${card.category.color};" class="category-card">${card.category.name}&lt;/div>
+        &lt;div class="card-text">
+            &lt;h3 class="card-title">${card.title}&lt;/h3>
+            &lt;p class="card-description">${card.description}&lt;/p>
+            &lt;!-- dont show more than 2 lines? JS? -->
+        &lt;/div>
+        ${TemplateSubtaskProgressbar(card)}
+        &lt;div class="icons-area">
+            &lt;div class="initial-card-container" id="assigned-container${card.id}">
+                &lt;div class="user-initals-card">TD&lt;/div>
+                &lt;div class="user-initals-card overlap">G&lt;/div>
+                &lt;div class="user-initals-card overlap">AB&lt;/div>
+            &lt;/div>
+            &lt;img src="${card.priority.img}" alt="">
+        &lt;/div>
+    &lt;/div>
+    `;
+}
+
+/**
+ * check if ther are subtask to put on the card for the todo card.
+ * 
+ * @param {*} card the arry of the card for the needet task
+ * @returns the Subtask section on the bord task card.
+ */
+function TemplateSubtaskProgressbar(card) {
+    if (card.subtasks.length > 0) {
+        let completeSubtask = card.subtasks.reduce((acc, subtask) => acc + subtask.done, 0);
+
+        return `
+        &lt;div class="progressbar-area">
+            &lt;div class="progressbar">
+                &lt;div class="progress-color" style="width:${progressbarCompetedRate(card)}%;">&lt;/div>
+            &lt;/div>
+            &lt;p>${completeSubtask}/${card.subtasks.length} Subtasks&lt;/p>
+        &lt;/div>
+        `;
+    } else {
+        return '';
+    }
+}
+
+/**
+ * Generates the HTML structure for the big card modal content based on a card object.
+ * @param {object} card The card object containing details to populate the template.
+ * @returns {string} The HTML string representing the big card modal content.
+ */
+function TaskCadBigTemplate(card, id) {
+    return `
+        &lt;div class="board-card-big-top">
+        &lt;div class="flex-row">
+            &lt;div style="background-color:${card.category.color};" class="category-card-big">${card.category.name} &lt;/div>
+            &lt;div class="dropdowen-task">
+                &lt;img class="dropdowen-arrow" onclick="dropdowenTask()" src="./img/arrow_drop_down.svg" alt="openDropdown">
+                &lt;div onfocusout="closeDropdowenTask()" tabindex="0" class="dropdown-container-task d-none" id="task-dropdown" onclick="doNotClose(event)">
+                    &lt;div class="move-to">    
+                        &lt;p>Move Task to:&lt;/p>
+                    &lt;/div> 
+                    &lt;div class="move-link">
+                        &lt;a onclick="dropMobile('todo', ${card.id})">todo&lt;/a>
+                        &lt;a onclick="dropMobile('progress', ${card.id})">In progress&lt;/a>
+                        &lt;a onclick="dropMobile('feedback', ${card.id})">Await feedback&lt;/a>
+                        &lt;a onclick="dropMobile('done', ${card.id})">done&lt;/a>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+            &lt;/div>
+            &lt;div class="board-card-close-container" onclick="closeCard()">
+                &lt;img class="board-card-close" src="./img/Close.svg" alt="close">
+                &lt;img class="board-card-close-hover" src="./img/close hover.svg" alt="close hover">
+            &lt;/div>
+        &lt;/div>
+        &lt;h1>${card.title} &lt;/h1>
+        &lt;p class="board-card-big-description">${card.description} &lt;/p>
+        &lt;div class="board-card-big-info">
+            &lt;h2>Due date:&lt;/h2>
+            &lt;p id="due-date"> &lt;/p>
+        &lt;/div>
+        &lt;div class="board-card-big-info">
+            &lt;h2>Priority: &lt;/h2>
+            &lt;div class="board-card-big-priority">
+                &lt;p> ${card.priority.urgency} &lt;/p>
+                &lt;img src="${card.priority.img} " alt="Priority">
+            &lt;/div>
+        &lt;/div>
+        &lt;div class="task-assigend-container" id="assigned-container">
+        &lt;/div>
+        &lt;div class="board-card-big-subtasks-arear" id="board-card-big-subtasks-arear">
+            &lt;h2>Subtasks&lt;/h2> 
+            &lt;div class="board-task-subtasks-container" id="board-task-subtasks-container">&lt;/div> 
+        &lt;/div>
+        &lt;div class="board-card-big-bottom" >
+            &lt;div class="board-card-icons" onclick="deleteTask(${id})">
+                &lt;img class="board-card-big-bottom-icon" src="./img/delete.svg" alt="Delete">
+                &lt;img class="board-card-big-bottom-icon-hover" src="./img/delete hover.svg" alt="delete hover">
+                Delete
+            &lt;/div>
+            &lt;div class="board-card-big-bottom-seperation">&lt;/div>
+            &lt;div class="board-card-icons" onclick="editTask(${id})">
+                &lt;img class="board-card-big-bottom-icon" src="./img/edit.svg" alt="Edit">
+                &lt;img class="board-card-big-bottom-icon-hover" src="./img/edit hover.svg" alt="edit hover">
+                Edit
+            &lt;/div>
+        &lt;/div>
+`;
+}
+
+/**
+ * Generates the HTML template for a single assigned user within the big card view.
+ *
+ * @param {object} user - A user object containing a `name` property (string) and a `color` property (string).
+ * @param {string} initials - The user's initials (uppercase) generated from their name.
+ * @returns {string} The HTML template string representing a single assigned user.
+ */
+function bigCardAssignedTemplate(user, initials) {
+    return `
+    &lt;div class="board-card-big-assingend-user">
+        &lt;div style="background-color:${user.avatarColor};" class="user-initals-card-big-card">${initials}&lt;/div>
+        &lt;p>${user.name}&lt;/p>
+    &lt;/div>
+    `;
+}
+
+/**
+ * Generates the HTML template for a single subtask within the big card modal.
+ *
+ * @param {string} taskText - The text content of the subtask.
+ * @param {string} img - The path to the image representing the subtask state.
+ * @param {boolean} done - Indicates whether the subtask is marked as completed.
+ * @param {number} i - The index of the subtask within the card's subtasks array.
+ * @param {number} id - The ID of the card containing the subtask.
+ * @returns {string} The HTML string representing the subtask template.
+ */
+function bigCardSubtaskTemplate(taskText, img, done, i, id) {
+    return `
+        &lt;div class="board-task-subtask">
+                &lt;p>&lt;img id="subtask${i}" onclick="SubtaskStatus(${done},${i},${id})" src="${img}">${taskText}&lt;/p>
+        &lt;/div>
+    `;
+}
+
+/**
+ * Generates the HTML template for the "Add Task" popup window.
+ *
+ * @returns {string} The HTML string representing the popup window structure.
+ */
+function boardPopupAddTaskWindow() {
+    return `
+    &lt;div class="borad-card-popup-addTask" id="borad-card-popup-addTask" onclick="doNotClose(event)">
+       &lt;div class="board-addTask-popup-top">
+            &lt;div class="add-task-titel-popup">
+                &lt;h1>Add Task&lt;/h1>
+            &lt;/div>
+            &lt;div class="board-popup-close-area">
+                &lt;div class="board-card-close-container" onclick="closeCard()">
+                    &lt;img class="board-card-close" src="./img/Close.svg" alt="close">
+                    &lt;img class="board-card-close-hover" src="./img/close hover.svg" alt="close hover">
+                &lt;/div>
+            &lt;/div>            
+        &lt;/div>
+        &lt;div class="addTask-popup-container" id="addTask-popup-container">
+        &lt;/div>
+    &lt;/div> 
+    `;
+}
+
+/**
+ * Generates the HTML structure for a large board card popup.
+ *
+ * @returns {string} The HTML string representing the board card popup structure.
+ */
+function EditTemplate() {
+    return `
+    &lt;div class="board-card-big-top-popup">
+        &lt;div class="board-card-close-container" onclick="closeCard()">
+            &lt;img class="board-card-close" src="./img/Close.svg" alt="close">
+            &lt;img class="board-card-close-hover" src="./img/close hover.svg" alt="close hover">
+        &lt;/div>
+    &lt;/div>
+    &lt;div class="fullHeight small-width" include-AddTask="./Templates/add_task-popup.html"> &lt;/div>
+    `
+}
+
+/**
+ * Updates the content of the "createTaskContainerPopup" element with an "Ok" button 
+ * for completing task editing.
+ *
+ * @param {string} id - The ID of the task being edited (likely used for internal logic).
+ */
+function templateOkBtn(id) {
+    const editTaskBntContainer = document.getElementById('createTaskContainerPopup');
+    editTaskBntContainer.innerHTML = `
+    &lt;button id="finish-btn" class="createTaskButton" onclick="editTaskDone(${id})">
+        &lt;p>Ok&lt;/p>
+        &lt;img src="./img/createTaskCheckIcon.svg">
+    &lt;/button>
+    `;
+}
+
+/**
+ * Generates the HTML structure for a mobile greeting element.
+ *
+ * Inserts the greeting content into the element with ID "content".
+ */
+function TemplateGreetMobile() {
+    document.getElementById('content').innerHTML = `
+    &lt;div class="greeting-container">
+        &lt;p id="greeting-mobile-user">&lt;/p>&lt;br>
+        &lt;h1 class="greeting-mobile" id="greeting-mobile">&lt;/h1>
+    &lt;/div>
+    `;
+}
+
+/**
+ * This function populates the contact info panel with the details of the clicked contact.
+ * It retrieves the contact data from the `contacts` array using the provided index.
+ * Then, it updates the HTML content of specific DOM elements with the contact's name, initials, avatar color, email, and phone number.
+ * Finally, it updates the "Edit Contact" and "Delete Contact" buttons with the clicked contact's index for proper functionality.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function openContactInfoHTMLTemplate(index) {
+    let contact = localContacts[index];
+    document.getElementById('contactInfoContactDetails').innerHTML = /*html*/`
+                    &lt;div class="contactInfoAvatarAndName">
+                        &lt;div class="contactInfoAvatar" style="background-color: ${contact.avatarColor};">
+                            ${contact['initials']}
+                        &lt;/div>
+                        &lt;div>
+                            &lt;div class="contactInfoName">
+                                ${contact['name']} ${contact['surname']}
+                            &lt;/div>
+                            &lt;div class="editContactMenuDesktop">
+                                &lt;div class="editContact" onclick="showEditContact(${index})">
+                                    &lt;img src="./img/editContactIcon.svg">
+                                    &lt;span>Edit&lt;/span>
+                                &lt;/div>
+                                &lt;div class="deleteContact" onclick="deleteContact(${index})">
+                                    &lt;img src="./img/deleteContactIcon.svg">
+                                    &lt;span>Delete&lt;/span>
+                                &lt;/div>
+                            &lt;/div>
+                        &lt;/div>
+                    &lt;/div>
+                    &lt;div class="contactInfoHeadlineDesktop">
+                Contact Information
+            &lt;/div>
+                    &lt;div class="contactInfoEmailAndPhone">
+                        &lt;div class="contactInfoEmail">
+                            &lt;p>Email&lt;/p>
+                            &lt;a href="mailto:abc@example.com">${contact['email']}&lt;/a>
+                        &lt;/div>
+                        &lt;div class="contactInfoPhone">
+                            &lt;p>Phone&lt;/p>
+                            &lt;span>${contact['phone']}&lt;/span>
+                        &lt;/div>
+                    &lt;/div>
+            `;
+
+    document.getElementById('editContactButtonContainer').innerHTML = /*html*/`
+             &lt;button class="addContactButton" id="addContactButton" onclick="showContactEditDeleteMenu(${index})">
+                &lt;img src="./img/contactMenuButton.svg">
+            &lt;/button>
+                                                                `;
+}
+
+function openGuestContactInfoHTMLTemplate(index){
+    let contact = localContacts[index];
+    document.getElementById('contactInfoContactDetails').innerHTML = /*html*/`
+                    &lt;div class="contactInfoAvatarAndName">
+                        &lt;div class="contactInfoAvatar" style="background-color: ${contact.avatarColor};">
+                            ${contact['initials']}
+                        &lt;/div>
+                        &lt;div>
+                            &lt;div class="contactInfoName">
+                                ${contact['name']} ${contact['surname']}
+                            &lt;/div>
+                            &lt;div class="editContactMenuDesktop">
+                                &lt;div class="editGuestContact">
+                                    &lt;img src="./img/editContactIcon.svg">
+                                    &lt;span>Edit&lt;/span>
+                                &lt;/div>
+                                &lt;div class="deleteGuestContact">
+                                    &lt;img src="./img/deleteContactIcon.svg">
+                                    &lt;span>Delete&lt;/span>
+                                &lt;/div>
+                            &lt;/div>
+                        &lt;/div>
+                    &lt;/div>
+                    &lt;div class="contactInfoHeadlineDesktop">
+                Contact Information
+            &lt;/div>
+                    &lt;div class="contactInfoEmailAndPhone">
+                        &lt;div class="contactInfoEmail">
+                            &lt;p>Email&lt;/p>
+                            &lt;a href="mailto:abc@example.com">${contact['email']}&lt;/a>
+                        &lt;/div>
+                        &lt;div class="contactInfoPhone">
+                            &lt;p>Phone&lt;/p>
+                            &lt;span>${contact['phone']}&lt;/span>
+                        &lt;/div>
+                    &lt;/div>
+            `;
+
+    document.getElementById('editContactButtonContainer').innerHTML = /*html*/`
+             &lt;button class="addContactButton" id="addContactButton" onclick="showContactEditDeleteMenu(${index})">
+                &lt;img src="./img/contactMenuButton.svg">
+            &lt;/button>
+                                                                `;
+}
+
+
+/**
+* This function shows the edit and delete menu for the clicked contact on mobile screens (less than 800px wide).
+* It populates the menu container with the "Edit" and "Delete" buttons and adds an event listener to prevent event bubbling.
+* @param {number} index - The index of the clicked contact in the `contacts` array.
+*/
+function showContactEditDeleteMenu(index) {
+    document.getElementById('editContactMenuContainer').classList.add('showEditContactMenu');
+    document.getElementById('editContactMenuContainer').innerHTML = /*html*/`
+                                                                                &lt;div class="editContactMenu" id="editContactMenu">
+                                                                                    &lt;div class="editContact" onclick="showEditContact(${index})">
+                                                                                        &lt;img src="./img/editContactIcon.svg">
+                                                                                        &lt;span>Edit&lt;/span>
+                                                                                    &lt;/div>
+                                                                                    &lt;div class="deleteContact" onclick="deleteContact(${index})">
+                                                                                        &lt;img src="./img/deleteContactIcon.svg">
+                                                                                        &lt;span>Delete&lt;/span>
+                                                                                    &lt;/div>
+                                                                                &lt;/div>
+
+    `;
+    document.getElementById('editContactMenu').onclick = function (event) {
+        event.stopPropagation();
+    };
+}
+
+/**
+ * This function populates the edit contact card with the details of the clicked contact.
+ * It sets the avatar background color and initials, fills the name, email, and phone input fields with the contact's data, and sets focus on the name field after a short delay.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function editContactDeleteAndSaveButtonLayoutHTMLTemplate(index) {
+    document.getElementById('addEditContactButtons').innerHTML = /*html*/`
+                                                                            &lt;button type="button" class="deleteEditContactButton" onclick="deleteContact(${index})">
+                                                                                &lt;p>Delete&lt;/p>
+                                                                            &lt;/button>
+                                                                            &lt;button type="submit"class="saveEditContactButton" onclick="updateContact(${index})">
+                                                                                &lt;p>Save&lt;/p>
+                                                                                &lt;img src="./img/createTaskCheckIcon.svg">
+                                                                            &lt;/button>
+                                                                        `;
+}
+
+function renderAllContactsHTMLTemplate(i, backgroundColor, contact, textColor, checkBoxSrc) {
+    return `&lt;div class="dropdownEachContact" id="dropdownEachContact(${i})" style="background-color: ${backgroundColor}" onclick="assingContact(${i})">
+                &lt;div class="assignToContactAvatarAndName">
+                    &lt;div class="assignToContactAvatar" style="background-color: ${contact['avatarColor']};">
+                    ${contact['initials']}
+                    &lt;/div>
+                    &lt;div class="assignToContactName" id="assignToContactName(${i})" style="color: ${textColor}">
+                    ${contact.name} ${contact.surname}
+                    &lt;/div>
+                &lt;/div>
+                &lt;div class="assignToCheckBox">
+                    &lt;img id="assignContactCheckBox(${i})" src="${checkBoxSrc}">
+                &lt;/div>
+            &lt;/div>
+        `;
+}
+
+function renderFilteredContactsHTMLTemplate(i, backgroundColor, contact, textColor, checkBoxSrc) {
+    return `
+    &lt;div class="dropdownEachContact" id="dropdownEachContact(${i})" style="background-color: ${backgroundColor}" onclick="assingContact(${i})">
+        &lt;div class="assignToContactAvatarAndName">
+            &lt;div class="assignToContactAvatar" style="background-color: ${contact['avatarColor']};">
+            ${contact['initials']}
+            &lt;/div>
+            &lt;div class="assignToContactName" id="assignToContactName(${i})" style="color: ${textColor}">
+            ${contact.name} ${contact.surname}
+            &lt;/div>
+        &lt;/div>
+        &lt;div class="assignToCheckBox">
+            &lt;img id="assignContactCheckBox(${i})" src="${checkBoxSrc}">
+        &lt;/div>
+    &lt;/div>
+    `;
+}
+
+function showSubtaskInputMenu() {
+    document.getElementById('addTaskSubtasksIcons').innerHTML = `
+    &lt;img src="./img/cancelCreateSubtask.svg" onclick="clearSubtaskInputField()">
+    &lt;div class="addTaskSubtasksIconsSeperator">&lt;/div>
+    &lt;img src="./img/saveCreateSubtask.svg" id="saveSubtaskInput" onclick="saveSubtaskInput()">
+    `;
+}
+
+function showDefaultInputMenu() {
+    document.getElementById('addTaskSubtasksIcons').innerHTML = `
+        &lt;div class="addTaskSubtasksIcons" id="addTaskSubtasksIcons">
+            &lt;img src="./img/addSubtaskPlusIcon.svg">
+        &lt;/div>
+        `;
+}
+
+function openCreatedSubtaskBoxHTMLTemplate(i, subtask) {
+    return `
+    &lt;div class="eachSubtask" id="eachSubtask(${i})">
+       &lt;li class="subtaskListInput" ondblclick="editCreatedSubtask(${i})">${subtask.text}&lt;/li>
+       &lt;div class="createdSubtasksIcons" id="createdSubtasksIcons">
+            &lt;img src="./img/edit.svg" onclick="editCreatedSubtask(${i})">
+            &lt;div class="addTaskSubtasksIconsSeperator">&lt;/div>
+            &lt;img src="./img/deleteContactIcon.svg" onclick="deleteCreatedSubtask(${i})">
+        &lt;/div>
+    &lt;/div>
+`;
+}
+
+function editCreatedSubtaskHTMLTemplate(i, currentSubtaskText) {
+    return `
+    &lt;div class="editEachSubtask" id="editEachSubtask(${i})" onclick="">
+        &lt;input class="editTaskSubtasksInput" id="editTaskSubtasksInput" type="text" autocomplete="off" value="${currentSubtaskText.text}" onkeypress="if (event.keyCode === 13) saveEditSubtaskInput(${i})">
+        &lt;div class="editCreatedSubtasksIcons" id="editCreatedSubtasksIcons">
+        &lt;img src="./img/deleteContactIcon.svg" onclick="deleteCreatedSubtask(${i}); event.stopPropagation();">
+            &lt;div class="addTaskSubtasksIconsSeperator">&lt;/div>
+            &lt;img src="./img/saveCreateSubtask.svg" onclick="saveEditSubtaskInput(${i}); event.stopPropagation();">
+        &lt;/div>
+    &lt;/div>
+    `;
+}
+
+function saveEditSubtaskInputHTMLTemplate(i, editedSubtask) {
+    return `
+        &lt;li class="subtaskListInput" ondblclick="editCreatedSubtask(${i})">${editedSubtask}&lt;/li>
+        &lt;div class="createdSubtasksIcons" id="createdSubtasksIcons">
+          &lt;img src="./img/edit.svg" onclick="editCreatedSubtask(${i})">
+          &lt;div class="addTaskSubtasksIconsSeperator">&lt;/div>
+          &lt;img src="./img/deleteContactIcon.svg" onclick="deleteCreatedSubtask(${i})">
+        &lt;/div>
+        `;
+}
+
+function restoreDefault() {
+    setItem("cards", backupCards)
+}
+
+const backupCards = [
+    {
+        "id": 0,
+        "place": "todo",
+        "category": {
+            "name": "Technical Task",
+            "color": "rgb(0,56,255)"
+        },
+        "title": "Implement Drag and Drop",
+        "description": "Allow users to drag and drop cards between columns (Todo, In Progress, Done) to update their status.",
+        "dueDate": "2024-05-10",
+        "subtasks": [
+            {
+                "text": "Design interaction for dragging cards",
+                "done": false
+            },
+            {
+                "text": "Implement logic for updating card positions",
+                "done": false
+            },
+            {
+                "text": "Handle visual feedback during drag and drop",
+                "done": false
+            }
+        ],
+        "assigned": [
+            {
+                "name": "Anton",
+                "surname": "Mayer",
+                "initials": "AM",
+                "avatarColor": "rgb(255,122,0)"
+            }
+        ],
+        "priority": {
+            "urgency": "Low",
+            "img": "./img/priorityLowInactive.svg"
+        }
+    },
+    {
+        "id": 1,
+        "place": "todo",
+        "category": {
+            "name": "User Story",
+            "color": "rgb(255,122,0)"
+        },
+        "title": "Design Card Component",
+        "description": "Create a reusable card component that displays task information (title, description, due date, etc.)",
+        "dueDate": "2024-05-12",
+        "subtasks": [
+            {
+                "text": "Define card layout and styles",
+                "done": false
+            },
+            {
+                "text": "Implement visual elements for card properties (title, assignee)",
+                "done": false
+            },
+            {
+                "text": "Ensure responsiveness for different screen sizes",
+                "done": false
+            }
+        ],
+        "assigned": [
+            {
+                "name": "Caroline",
+                "surname": "Tabeling",
+                "initials": "CT",
+                "avatarColor": "rgb(31,215,193)"
+            },
+            {
+                "name": "Anton",
+                "surname": "Mayer",
+                "initials": "AM",
+                "avatarColor": "rgb(255,122,0)"
+            }
+        ],
+        "priority": {
+            "urgency": "Urgent",
+            "img": "./img/priorityHighInactive.svg"
+        }
+    },
+    {
+        "id": 2,
+        "place": "progress",
+        "category": {
+            "name": "Technical Task",
+            "color": "rgb(0,56, 255)"
+        },
+        "title": "Display Card Metadata",
+        "description": "Fetch and display additional card information like assigned users and due dates.",
+        "dueDate": "2024-05-26",
+        "subtasks": [
+            {
+                "text": "Define API endpoint for card data",
+                "done": true
+            },
+            {
+                "text": "Implement logic to retrieve card data",
+                "done": true
+            },
+            {
+                "text": "Update card UI to display retrieved data",
+                "done": false
+            }
+        ],
+        "assigned": [
+            {
+                "name": "Bernt",
+                "surname": "Saathoff",
+                "initials": "BS",
+                "avatarColor": "rgb(255,187,43)"
+            }
+        ],
+        "priority": {
+            "urgency": "Medium",
+            "img": "./img/priorityMediumInactive.svg"
+        }
+    },
+    {
+        "id": 3,
+        "place": "feedback",
+        "category": {
+            "name": "Technical Task",
+            "color": "rgb(0,56,255)"
+        },
+        "title": "Refine User Authentication",
+        "description": "Review and improve the implemented user authentication system. Consider adding features like password hashing, secure session management, and role-based access control (RBAC) if necessary.",
+        "dueDate": "2024-08-07",
+        "subtasks": [
+            {
+                "text": "Evaluate the security strength of current implementation",
+                "done": true
+            },
+            {
+                "text": "Implement additional security measures (password hashing, session management)",
+                "done": true
+            },
+            {
+                "text": "Consider adding RBAC for differentiated user permissions (optional)",
+                "done": true
+            }
+        ],
+        "assigned": [
+            {
+                "name": "Diana",
+                "surname": "König",
+                "initials": "DK",
+                "avatarColor": "rgb(255,70,70)"
+            },
+            {
+                "name": "Erik",
+                "surname": "Wagner",
+                "initials": "EW",
+                "avatarColor": "rgb(255,0,191)"
+            }
+        ],
+        "priority": {
+            "urgency": "Medium",
+            "img": "./img/priorityMediumInactive.svg"
+        }
+    },
+    {
+        "id": 4,
+        "place": "progress",
+        "category": {
+            "name": "Technical Task",
+            "color": "rgb(0,56,255)"
+        },
+        "title": "Implement Data Persistence",
+        "description": "Store card data (title, description, due date, assigned users, etc.) in a persistent storage mechanism like a database or local storage. Ensure data integrity and retrieval.",
+        "dueDate": "2024-05-10",
+        "subtasks": [
+            {
+                "text": "Choose a suitable data storage solution",
+                "done": false
+            },
+            {
+                "text": "Design data schema to represent card information",
+                "done": true
+            },
+            {
+                "text": "Implement logic to save and load card data from storage",
+                "done": false
+            }
+        ],
+        "assigned": [
+            {
+                "name": "Erik",
+                "surname": "Wagner",
+                "initials": "EW",
+                "avatarColor": "rgb(255,0,191)"
+            }
+        ],
+        "priority": {
+            "urgency": "Urgent",
+            "img": "./img/priorityHighInactive.svg"
+        }
+    },
+    {
+        "id": 5,
+        "place": "feedback",
+        "category": {
+            "name": "User Story",
+            "color": "rgb(255,122,0)"
+        },
+        "title": "Implement User Interface",
+        "description": "Design the overall user interface for the Kanban board, including card layouts, columns, drag-and-drop interactions, and visual feedback elements.",
+        "dueDate": "2024-05-07",
+        "subtasks": [
+            {
+                "text": "Create mockups for different Kanban board views",
+                "done": true
+            },
+            {
+                "text": "Design user interactions like adding, editing, and deleting cards",
+                "done": true
+            },
+            {
+                "text": "Ensure a clean and user-friendly visual style",
+                "done": true
+            }
+        ],
+        "assigned": [
+            {
+                "name": "Fiona",
+                "surname": "Müller",
+                "initials": "FM",
+                "avatarColor": "rgb(255,122,0)"
+            }
+        ],
+        "priority": {
+            "urgency": "Urgent",
+            "img": "./img/priorityHighInactive.svg"
+        }
+    }
+]
+
+let contacts = [
+    {
+        "name": "Anton",
+        "surname": "Mayer",
+        "initials": "AM",
+        "avatarColor": "rgb(255,122,0)",
+        "email": "anton@gmail.com",
+        "phone": "+49 1111 111 11 1",
+        "category": "A"
+    },
+    {
+        "name": "Albert",
+        "surname": "Gerdes",
+        "initials": "AG",
+        "avatarColor": "rgb(255,70,70)",
+        "email": "albert@gmail.com",
+        "phone": "+49 2222 222 22 2",
+        "category": "A"
+    },
+    {
+        "name": "Aaron",
+        "surname": "Brier",
+        "initials": "AB",
+        "avatarColor": "rgb(147,39,255)",
+        "email": "aaron@gmail.com",
+        "phone": "+49 3333 333 33 3",
+        "category": "A"
+    },
+    {
+        "name": "Britta",
+        "surname": "Zielke",
+        "initials": "BZ",
+        "avatarColor": "rgb(110,82,255)",
+        "email": "b.zielke@gmail.com",
+        "phone": "+49 4444 444 44 4",
+        "category": "B"
+    },
+    {
+        "name": "Carsten",
+        "surname": "Schmidt",
+        "initials": "CS",
+        "avatarColor": "rgb(252,113,255)",
+        "email": "carsten.schmidt@gmail.com",
+        "phone": "+49 5555 555 55 5",
+        "category": "C"
+    },
+    {
+        "name": "Bernt",
+        "surname": "Saathoff",
+        "initials": "BS",
+        "avatarColor": "rgb(255,187,43)",
+        "email": "bernt.s@gmail.com",
+        "phone": "+49 6666 666 66 6",
+        "category": "B"
+    },
+    {
+        "name": "Caroline",
+        "surname": "Tabeling",
+        "initials": "CT",
+        "avatarColor": "rgb(31,215,193)",
+        "email": "caroline@gmail.com",
+        "phone": "+49 7777 777 77 7",
+        "category": "C"
+    },
+    {
+        "name": "Diana",
+        "surname": "König",
+        "initials": "DK",
+        "avatarColor": "rgb(255,70,70)",
+        "email": "diana.koenig@gmail.com",
+        "phone": "+49 8888 888 88 8",
+        "category": "D"
+    },
+    {
+        "name": "Erik",
+        "surname": "Wagner",
+        "initials": "EW",
+        "avatarColor": "rgb(255,0,191)",
+        "email": "erik.wagner@gmail.com",
+        "phone": "+49 9999 999 99 9",
+        "category": "E"
+    },
+    {
+        "name": "Fiona",
+        "surname": "Müller",
+        "initials": "FM",
+        "avatarColor": "rgb(255,122,0)",
+        "email": "fiona.mueller@gmail.com",
+        "phone": "+49 1010 101 01 0",
+        "category": "F"
+    }
+]
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#CreatedPopUpOptions">CreatedPopUpOptions</a></li><li><a href="global.html#EditTemplate">EditTemplate</a></li><li><a href="global.html#NoMatchFound">NoMatchFound</a></li><li><a href="global.html#SubtaskStatus">SubtaskStatus</a></li><li><a href="global.html#TaskCadBigTemplate">TaskCadBigTemplate</a></li><li><a href="global.html#TaskTextInEdit">TaskTextInEdit</a></li><li><a href="global.html#TemplateGreetMobile">TemplateGreetMobile</a></li><li><a href="global.html#TemplateSubtaskProgressbar">TemplateSubtaskProgressbar</a></li><li><a href="global.html#Templates">Templates</a></li><li><a href="global.html#UpdateTaskInRemote">UpdateTaskInRemote</a></li><li><a href="global.html#UserInitals">UserInitals</a></li><li><a href="global.html#addContactButtonsCancelAndCreateButtonsHTMLTemplate">addContactButtonsCancelAndCreateButtonsHTMLTemplate</a></li><li><a href="global.html#addTaskInit">addTaskInit</a></li><li><a href="global.html#addTaskToBoard">addTaskToBoard</a></li><li><a href="global.html#addUser">addUser</a></li><li><a href="global.html#allowDrop">allowDrop</a></li><li><a href="global.html#assignedInitals">assignedInitals</a></li><li><a href="global.html#assingContact">assingContact</a></li><li><a href="global.html#bigCard">bigCard</a></li><li><a href="global.html#bigCardAssigned">bigCardAssigned</a></li><li><a href="global.html#bigCardAssignedTemplate">bigCardAssignedTemplate</a></li><li><a href="global.html#bigCardSubtaskTemplate">bigCardSubtaskTemplate</a></li><li><a href="global.html#bigCardSubtasks">bigCardSubtasks</a></li><li><a href="global.html#bigCardSubtasksCheck">bigCardSubtasksCheck</a></li><li><a href="global.html#boardPlace">boardPlace</a></li><li><a href="global.html#boardPopupAddTask">boardPopupAddTask</a></li><li><a href="global.html#boardPopupAddTaskWindow">boardPopupAddTaskWindow</a></li><li><a href="global.html#boardTaskNumber">boardTaskNumber</a></li><li><a href="global.html#buildTemplateForArrayInput">buildTemplateForArrayInput</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#cardTemplate">cardTemplate</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#changeBackCheckBoxStyle">changeBackCheckBoxStyle</a></li><li><a href="global.html#changeCheckBoxStyle">changeCheckBoxStyle</a></li><li><a href="global.html#changeContactButtonColorAsClicked">changeContactButtonColorAsClicked</a></li><li><a href="global.html#changeContactButtonEmailColorToWhite">changeContactButtonEmailColorToWhite</a></li><li><a href="global.html#changeLockIcon">changeLockIcon</a></li><li><a href="global.html#changeNavigation">changeNavigation</a></li><li><a href="global.html#changeNavigationAddTask">changeNavigationAddTask</a></li><li><a href="global.html#changeNavigationHighlightSummary">changeNavigationHighlightSummary</a></li><li><a href="global.html#changeNavigationPrivacyPolicy">changeNavigationPrivacyPolicy</a></li><li><a href="global.html#changePriorityColor">changePriorityColor</a></li><li><a href="global.html#checkAssignContact">checkAssignContact</a></li><li><a href="global.html#checkCards">checkCards</a></li><li><a href="global.html#checkErrors">checkErrors</a></li><li><a href="global.html#checkForDuplicateEmail">checkForDuplicateEmail</a></li><li><a href="global.html#checkIfEmailExists">checkIfEmailExists</a></li><li><a href="global.html#checkIfUserIsAddedAsContact">checkIfUserIsAddedAsContact</a></li><li><a href="global.html#checkInputValue">checkInputValue</a></li><li><a href="global.html#checkPasswordStrength">checkPasswordStrength</a></li><li><a href="global.html#checkPrivacyPolicy">checkPrivacyPolicy</a></li><li><a href="global.html#clearAddContactForm">clearAddContactForm</a></li><li><a href="global.html#clearPasswordError">clearPasswordError</a></li><li><a href="global.html#clearSubtaskInputField">clearSubtaskInputField</a></li><li><a href="global.html#clickedButtonEmailColors">clickedButtonEmailColors</a></li><li><a href="global.html#clickedButtons">clickedButtons</a></li><li><a href="global.html#clickedLegalPart">clickedLegalPart</a></li><li><a href="global.html#closeAssignToDropdown">closeAssignToDropdown</a></li><li><a href="global.html#closeCard">closeCard</a></li><li><a href="global.html#closeContactInfo">closeContactInfo</a></li><li><a href="global.html#closeDropdowenTask">closeDropdowenTask</a></li><li><a href="global.html#closeDropdown">closeDropdown</a></li><li><a href="global.html#closeTaskCategoryDropdown">closeTaskCategoryDropdown</a></li><li><a href="global.html#createCardObject">createCardObject</a></li><li><a href="global.html#createCategories">createCategories</a></li><li><a href="global.html#createContact">createContact</a></li><li><a href="global.html#createNewContactDataSet">createNewContactDataSet</a></li><li><a href="global.html#createTask">createTask</a></li><li><a href="global.html#createUserAsContact">createUserAsContact</a></li><li><a href="global.html#currentDraggedElement">currentDraggedElement</a></li><li><a href="global.html#deleteContact">deleteContact</a></li><li><a href="global.html#deleteCreatedSubtask">deleteCreatedSubtask</a></li><li><a href="global.html#deleteTask">deleteTask</a></li><li><a href="global.html#deleteUneditTask">deleteUneditTask</a></li><li><a href="global.html#displayClosestDueDate">displayClosestDueDate</a></li><li><a href="global.html#doNotClose">doNotClose</a></li><li><a href="global.html#doneCardUpdate">doneCardUpdate</a></li><li><a href="global.html#doneNumber">doneNumber</a></li><li><a href="global.html#drop">drop</a></li><li><a href="global.html#dropMobile">dropMobile</a></li><li><a href="global.html#dropdowenTask">dropdowenTask</a></li><li><a href="global.html#dropdownHelp">dropdownHelp</a></li><li><a href="global.html#dropdownLegalNotice">dropdownLegalNotice</a></li><li><a href="global.html#dropdownPrivacyPolicy">dropdownPrivacyPolicy</a></li><li><a href="global.html#editContactDeleteAndSaveButtonLayoutHTMLTemplate">editContactDeleteAndSaveButtonLayoutHTMLTemplate</a></li><li><a href="global.html#editCreatedSubtask">editCreatedSubtask</a></li><li><a href="global.html#editTask">editTask</a></li><li><a href="global.html#editTaskDone">editTaskDone</a></li><li><a href="global.html#emptyArrays">emptyArrays</a></li><li><a href="global.html#errorMessageIfEmptyCategory">errorMessageIfEmptyCategory</a></li><li><a href="global.html#errorMessageIfEmptyDueDate">errorMessageIfEmptyDueDate</a></li><li><a href="global.html#errorMessageIfEmptyTitle">errorMessageIfEmptyTitle</a></li><li><a href="global.html#feedbackCardUpdate">feedbackCardUpdate</a></li><li><a href="global.html#feedbackNumber">feedbackNumber</a></li><li><a href="global.html#formatContactName">formatContactName</a></li><li><a href="global.html#formatDueDate">formatDueDate</a></li><li><a href="global.html#getCategoryColor">getCategoryColor</a></li><li><a href="global.html#getContactData">getContactData</a></li><li><a href="global.html#getContactRelatedInfo">getContactRelatedInfo</a></li><li><a href="global.html#getIndexByNameSurname">getIndexByNameSurname</a></li><li><a href="global.html#getOldestOverdueDate">getOldestOverdueDate</a></li><li><a href="global.html#getPriorityImagePath">getPriorityImagePath</a></li><li><a href="global.html#getQueryParam">getQueryParam</a></li><li><a href="global.html#getSelectedContact">getSelectedContact</a></li><li><a href="global.html#getTaskData">getTaskData</a></li><li><a href="global.html#giveId">giveId</a></li><li><a href="global.html#goBack">goBack</a></li><li><a href="global.html#greetUser">greetUser</a></li><li><a href="global.html#greetUserMobile">greetUserMobile</a></li><li><a href="global.html#guestLogin">guestLogin</a></li><li><a href="global.html#handleContactAssignment">handleContactAssignment</a></li><li><a href="global.html#handleRememberMeChange">handleRememberMeChange</a></li><li><a href="global.html#hideAddContactCard">hideAddContactCard</a></li><li><a href="global.html#hideContactEditDeleteMenu">hideContactEditDeleteMenu</a></li><li><a href="global.html#highlightCreatedContact">highlightCreatedContact</a></li><li><a href="global.html#highlightErrorMessage">highlightErrorMessage</a></li><li><a href="global.html#includeAddTask">includeAddTask</a></li><li><a href="global.html#includeHTML">includeHTML</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initContacts">initContacts</a></li><li><a href="global.html#insertAnimation">insertAnimation</a></li><li><a href="global.html#isAssignedEdit">isAssignedEdit</a></li><li><a href="global.html#legalNoticeHiglite">legalNoticeHiglite</a></li><li><a href="global.html#loadAddTasks">loadAddTasks</a></li><li><a href="global.html#loadBoard">loadBoard</a></li><li><a href="global.html#loadContacts">loadContacts</a></li><li><a href="global.html#loadRememberedPassword">loadRememberedPassword</a></li><li><a href="global.html#loadRemoteContactsOfLoggedInUser">loadRemoteContactsOfLoggedInUser</a></li><li><a href="global.html#loadTasks">loadTasks</a></li><li><a href="global.html#loadUsers">loadUsers</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#lowPriorityButtonStylingWhenClicked">lowPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#matchingCategoryCheck">matchingCategoryCheck</a></li><li><a href="global.html#mediumPriorityButtonStylingWhenClicked">mediumPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#mobileGreeting">mobileGreeting</a></li><li><a href="global.html#navigateTo">navigateTo</a></li><li><a href="global.html#navigationClick">navigationClick</a></li><li><a href="global.html#navigationClickImg">navigationClickImg</a></li><li><a href="global.html#newContactDataSetForArray">newContactDataSetForArray</a></li><li><a href="global.html#openAssignToDropdown">openAssignToDropdown</a></li><li><a href="global.html#openContactInfo">openContactInfo</a></li><li><a href="global.html#openContactInfoHTMLTemplate">openContactInfoHTMLTemplate</a></li><li><a href="global.html#openCreatedSubtaskBox">openCreatedSubtaskBox</a></li><li><a href="global.html#openDropdown">openDropdown</a></li><li><a href="global.html#openTaskCategoryDropdown">openTaskCategoryDropdown</a></li><li><a href="global.html#outputDeadlineText">outputDeadlineText</a></li><li><a href="global.html#outputDueDate">outputDueDate</a></li><li><a href="global.html#priorityEdit">priorityEdit</a></li><li><a href="global.html#priorityImgCheck">priorityImgCheck</a></li><li><a href="global.html#privacyPolicyHighlight">privacyPolicyHighlight</a></li><li><a href="global.html#progressCardUpdate">progressCardUpdate</a></li><li><a href="global.html#progressNumber">progressNumber</a></li><li><a href="global.html#progressbarCompetedRate">progressbarCompetedRate</a></li><li><a href="global.html#redesignAddContactCardToEditContactCard">redesignAddContactCardToEditContactCard</a></li><li><a href="global.html#rememberPassword">rememberPassword</a></li><li><a href="global.html#removeClickedLegalPart">removeClickedLegalPart</a></li><li><a href="global.html#removeNavHighlightLegalPartOnDropdown">removeNavHighlightLegalPartOnDropdown</a></li><li><a href="global.html#removeNavHighlightOnDropdown">removeNavHighlightOnDropdown</a></li><li><a href="global.html#removeNavigationClick">removeNavigationClick</a></li><li><a href="global.html#renderAddContactLayout">renderAddContactLayout</a></li><li><a href="global.html#renderAllContacts">renderAllContacts</a></li><li><a href="global.html#renderContactCategory">renderContactCategory</a></li><li><a href="global.html#renderContactCategoryAndEachContact">renderContactCategoryAndEachContact</a></li><li><a href="global.html#renderContactList">renderContactList</a></li><li><a href="global.html#renderEachContact">renderEachContact</a></li><li><a href="global.html#renderFilteredContacts">renderFilteredContacts</a></li><li><a href="global.html#resetAddTaskForm">resetAddTaskForm</a></li><li><a href="global.html#resetContactButtonColor">resetContactButtonColor</a></li><li><a href="global.html#resetContactButtonEmailColor">resetContactButtonEmailColor</a></li><li><a href="global.html#resetCreateTaskFormInputs">resetCreateTaskFormInputs</a></li><li><a href="global.html#resetLastClickedContactButtonColor">resetLastClickedContactButtonColor</a></li><li><a href="global.html#resetLastClickedContactButtonEmailColor">resetLastClickedContactButtonEmailColor</a></li><li><a href="global.html#resetNavigationItems">resetNavigationItems</a></li><li><a href="global.html#resetOtherPriorityButtonStyles">resetOtherPriorityButtonStyles</a></li><li><a href="global.html#saveEditSubtaskInput">saveEditSubtaskInput</a></li><li><a href="global.html#saveNewUser">saveNewUser</a></li><li><a href="global.html#saveSubtaskInput">saveSubtaskInput</a></li><li><a href="global.html#scrollDown">scrollDown</a></li><li><a href="global.html#scrollToAnchor">scrollToAnchor</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchContactToAssign">searchContactToAssign</a></li><li><a href="global.html#selectTaskCategory">selectTaskCategory</a></li><li><a href="global.html#separateCards">separateCards</a></li><li><a href="global.html#setButtonColorAsClicked">setButtonColorAsClicked</a></li><li><a href="global.html#setEmailColorAsClicked">setEmailColorAsClicked</a></li><li><a href="global.html#setGuestLogin">setGuestLogin</a></li><li><a href="global.html#setUserLogin">setUserLogin</a></li><li><a href="global.html#showAddContactCard">showAddContactCard</a></li><li><a href="global.html#showAvatarsOfSelectedContacts">showAvatarsOfSelectedContacts</a></li><li><a href="global.html#showContactCreatedPopUp">showContactCreatedPopUp</a></li><li><a href="global.html#showContactEditDeleteMenu">showContactEditDeleteMenu</a></li><li><a href="global.html#showCurrentContactDetails">showCurrentContactDetails</a></li><li><a href="global.html#showEditAndDeleteMenuOnMobile">showEditAndDeleteMenuOnMobile</a></li><li><a href="global.html#showEditContact">showEditContact</a></li><li><a href="global.html#showTaskCreatedPopUp">showTaskCreatedPopUp</a></li><li><a href="global.html#showTaskCreatedPopUpBoard">showTaskCreatedPopUpBoard</a></li><li><a href="global.html#sortByFirstName">sortByFirstName</a></li><li><a href="global.html#sortUpcomingCards">sortUpcomingCards</a></li><li><a href="global.html#startAnimation">startAnimation</a></li><li><a href="global.html#startDragging">startDragging</a></li><li><a href="global.html#subtaskCompleted">subtaskCompleted</a></li><li><a href="global.html#subtaskEdit">subtaskEdit</a></li><li><a href="global.html#subtaskNotCompleted">subtaskNotCompleted</a></li><li><a href="global.html#successfulLogin">successfulLogin</a></li><li><a href="global.html#successfulSignup">successfulSignup</a></li><li><a href="global.html#summaryLoad">summaryLoad</a></li><li><a href="global.html#summaryLoadNumbers">summaryLoadNumbers</a></li><li><a href="global.html#templateOkBtn">templateOkBtn</a></li><li><a href="global.html#todoCardUpdate">todoCardUpdate</a></li><li><a href="global.html#todoNumber">todoNumber</a></li><li><a href="global.html#toggleAssignToDropdown">toggleAssignToDropdown</a></li><li><a href="global.html#toggleCheckbox">toggleCheckbox</a></li><li><a href="global.html#toggleContactButtonColor">toggleContactButtonColor</a></li><li><a href="global.html#toggleContactButtonEmailColor">toggleContactButtonEmailColor</a></li><li><a href="global.html#toggleIndex">toggleIndex</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePrivacyPolicyCheckbox">togglePrivacyPolicyCheckbox</a></li><li><a href="global.html#toggleRememberMeCheckbox">toggleRememberMeCheckbox</a></li><li><a href="global.html#toggleSelectTaskCategoryDropdown">toggleSelectTaskCategoryDropdown</a></li><li><a href="global.html#uncheckAssignContact">uncheckAssignContact</a></li><li><a href="global.html#unclickCreatedContact">unclickCreatedContact</a></li><li><a href="global.html#updateCards">updateCards</a></li><li><a href="global.html#updateContact">updateContact</a></li><li><a href="global.html#updateDueDateContainers">updateDueDateContainers</a></li><li><a href="global.html#updateUserContactsInRemote">updateUserContactsInRemote</a></li><li><a href="global.html#updateUserContactsInRemoteAfterRegistration">updateUserContactsInRemoteAfterRegistration</a></li><li><a href="global.html#urgentButtonColor">urgentButtonColor</a></li><li><a href="global.html#urgentNumber">urgentNumber</a></li><li><a href="global.html#urgentPriorityButtonStylingWhenClicked">urgentPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#validateConfirmedPassword">validateConfirmedPassword</a></li><li><a href="global.html#validateEmailAddress">validateEmailAddress</a></li><li><a href="global.html#validateFormFields">validateFormFields</a></li><li><a href="global.html#validateTaskData">validateTaskData</a></li><li><a href="global.html#wrongPasswordMessage">wrongPasswordMessage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue May 07 2024 10:05:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

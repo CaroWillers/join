@@ -1,0 +1,89 @@
+<div class="addTaskWrapperPopup">
+    <div class="addTaskContainerPopup" id="addTaskContainer">
+        <div class="enterTitleBox">
+            <input class="addTaskInputTitle" id="addTaskInputTitle" onfocusout="errorMessageIfEmptyTitle()" type="text"
+                placeholder="Enter a title" required autocomplete="off">
+            <p class="errorMessageIfEmptyTitle">This field is required</p>
+        </div>
+        <div class="descriptionBox">
+            <span class="addTaskTopics">
+                <h3>Description</h3>(optional)
+            </span>
+            <textarea class="addTaskDescriptionInput" id="addTaskDescriptionInput" name="text" id="text"
+                placeholder="Enter a description" required></textarea>
+        </div>
+        <div class="dueDateBox">
+            <span class="addTaskTopics">
+                <h3>Due date</h3>
+            </span>
+            <input class="addTaskDueDateInput" id="addTaskDueDateInput" onfocusout="errorMessageIfEmptyDueDate()"
+                type="date" placeholder="dd/mm/yyyy">
+            <p class="errorMessageIfEmptyDueDate">This field is required</p>
+        </div>
+        <div class="priorityBox">
+            <span class="addTaskTopics">
+                <h3>Priority</h3>
+            </span>
+            <div class="priorityButtons">
+                <button id="urgentPriorityButton" class="urgentPriorityButton" data-priority="Urgent"
+                    onclick="changePriorityColor('urgentPriorityButton')">Urgent <img id="urgentIcon" class="urgentIcon"
+                        src="./img/priorityHighInactive.svg"></button>
+                <button id="mediumPriorityButton" class="mediumPriorityButton" data-priority="Medium"
+                    onclick="changePriorityColor('mediumPriorityButton')">Medium <img id="mediumIcon" class="mediumIcon"
+                        src="./img/priorityMediumInactive.svg"></button>
+                <button id="lowPriorityButton" class="lowPriorityButton" data-priority="Low"
+                    onclick="changePriorityColor('lowPriorityButton')">Low <img id="lowIcon" class="lowIcon"
+                        src="./img/priorityLowInactive.svg"></button>
+            </div>
+        </div>
+        <div class="assignedToBox">
+            <span class="addTaskTopics">
+                <h3>Assigned to</h3>(optional)
+            </span>
+            <input class="assignContactsDropdown" id="assignContactsDropdown" onclick="toggleAssignToDropdown()" oninput="searchContactToAssign()" placeholder="Select contacts to assign" autocomplete="off">
+            </input>
+            <div class="dropdowncontacts" id="dropdowncontacts" style="display: none">
+            </div>
+            <div class="avatarsOfSelectedContacts" id="avatarsOfSelectedContacts" style="display: none">
+            </div>
+        </div>
+        <div class="taskCategoryBox" id="taskCategoryBoxPopup">
+            <span class="addTaskTopics">
+                <h3>Category</h3>
+            </span>
+            <div class="selectTaskDropdown" id="selectTaskDropdown" onclick="toggleSelectTaskCategoryDropdown()">
+                <span id="selectTaskCategoryTextField">Select task category</span>
+            </div>
+            <p class="errorMessageIfEmptyCategory">This field is required</p>
+            <div class="dropdownSelectTasksCategory" id="dropdownSelectTasksCategory" style="display: none">
+            </div>
+        </div>
+        <div class="subtasksBox" id="subtasksBox">
+            <span class="addTaskTopics">
+                <h3>Subtasks</h3>(optional)
+            </span>
+            <div class="addTaskSubtasksInputContainer">
+                <input class="addTaskSubtasksInput" id="addTaskSubtasksInput" type="text" placeholder="Add new subtask"
+                    oninput="showSubtaskInputMenu(); checkInputValue()"
+                    onkeypress="if (event.keyCode === 13) saveSubtaskInput()" autocomplete="off">
+                <div class="addTaskSubtasksIcons" id="addTaskSubtasksIcons">
+                    <img src="./img/addSubtaskPlusIcon.svg">
+                </div>
+            </div>
+            <div class="createdSubTasksBox" id="createdSubTasksBox" style="display: none">
+            </div>
+        </div>
+    </div>
+    <div class="createTaskContainerPopup" id="createTaskContainerPopup">
+        <button id="finish-btn" class="createTaskButton" onclick="createTask()">
+            <p>Create Task</p>
+            <img src="./img/createTaskCheckIcon.svg">
+        </button>
+    </div>
+</div>
+<div class="taskCreatedButtonContainerPopup" id="taskCreatedButtonContainerBoard" style="display: none">
+    <div class="taskCreatedButtonPopup" id="taskCreatedButton">
+        <p>Task added to board</p>
+        <img src="../img/boardIconWhite.svg">
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<div class="summary-overview">
+    <div class="greeting-Container">
+        <p id="greeting-user" class="greeting-user"></p>
+        <h1 class="greeting" id="greeting"></h1>
+    </div>
+    <div class="btn-container">
+        <button class="urgent-button" onclick="loadBoard()">
+            <div class="btn-urgent-front">
+                <div class="flex-row">
+                    <img src="./img/urgent icon.svg" alt="clock icon">
+                    <h2 id="urgent-number" class="task-number">1</h2>
+                </div>
+                <p class="btn-text">Tasks Urgent</p>
+            </div>
+            <div class="wiht-line"></div>
+            <div class="btn-urgent-back">
+                <h2 id="due-date">April 13, 2024</h2>
+                <p id="deadline">Upcoming Deadline</p>
+            </div>
+        </button>
+        <button class="to-do-btn" onclick="loadBoard()">
+            <div class="to-do-btn-row">
+                <img src="./img/To-do Icon.svg" alt="to-do icon">
+                <h2 id="to-do-number" class="task-number">1</h2>
+            </div>
+            <p class="btn-text">Tasks To-Do</p>
+        </button>
+        <button class="light-task-btn board" onclick="loadBoard()">
+            <div class="flex-row gap-btn-light">
+                <div class="summary-boarder-icon"><img src="./img/Board task Icon.svg" alt=""></div>
+                <h2 id="bord-tasks-number" class="task-number">5</h2>
+            </div>
+            <p class="btn-text">Tasks on<br> Board</p>
+        </button>
+        <button class="light-task-btn progress" onclick="loadBoard()">
+            <div class="flex-row  gap-btn-light">
+                <div class="summary-boarder-icon"><img src="./img/Progress Icon.svg" alt=""></div>
+                <h2 id="progess-task-number" class="task-number">2</h2>
+            </div>
+            <p class="btn-text">Tasks in<br> Progress</p>
+        </button>
+        <button class="light-task-btn feedback" onclick="loadBoard()">
+            <div class="flex-row  gap-btn-light">
+                <div class="summary-boarder-icon"><img src="./img/feedback Icon.svg" alt=""></div>
+                <h2 id="feedback-number" class="task-number">2</h2>
+            </div>
+            <p class="btn-text">Awaiting<br> feedback</p>
+        </button>
+        <button class="light-task-btn done" onclick="loadBoard()">
+            <div class="flex-row  gap-btn-light">
+                <div class="summary-boarder-icon"><img src="./img/Done Icon.svg" alt=""></div>
+                <h2 id="done-number" class="task-number">5</h2>
+            </div>
+            <p class="btn-text">Tasks <br> Done</p>
+        </button>
+    </div>
+</div>

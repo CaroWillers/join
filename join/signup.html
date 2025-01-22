@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOIN</title>
+    <link rel="icon" type="image/vnd.icon" href="../img/join.ico">
+    <link rel="stylesheet" href="./Stylesheets/style.css">
+    <link rel="stylesheet" href="./Stylesheets/board.css">
+    <link rel="stylesheet" href="./Stylesheets/summary.css">
+    <link rel="stylesheet" href="./Stylesheets/register.css">
+    <link rel="stylesheet" href="./Stylesheets/addTask.css">
+    <link rel="stylesheet" href="./Stylesheets/contacts.css">
+    <script src="./JS/script.js"></script>
+    <script src="./JS/summary.js"></script>
+    <script src="./JS/contacts_part1.js"></script>
+    <script src="./JS/contacts_part2.js"></script>
+    <script src="./JS/privacyAndLegal.js"></script>
+    <script src="./JS/signup.js"></script>
+    <script src="./JS/login.js"></script>
+    <script src="./JS/storage.js"></script>
+    <script src="./JS/addTask_part1.js"></script>
+    <script src="./JS/addTask_part2.js"></script>
+    <script src="./JS/board_part1.js"></script>
+    <script src="./JS/board_part2.js"></script>
+    <script src="./JS/templates.js"></script>
+    <link rel="stylesheet" href="./fonts/fonts.css">
+</head>
+<main class="signupContainer"> 
+    <div class="signupHeader">
+        <img src="../img/logoNegative.png"> 
+    </div>     
+    <div class="signupContent">
+        <div class="headlineContainer" > 
+            <button class="goBackButton" onclick="window.location.href='../login.html'">
+                <div class="imageContainer"></div>
+            </button>
+            <div style= "margin-left: -45px;"class="signupHeadline">
+                <h1 class="h1Login">Sign up</h1> 
+                <div class="seperator"></div>
+            </div>   
+        </div>
+        <form class="loginForm" onsubmit="addUser(); return false">
+            <div class="inputField">
+                <input class="input" type="name" required id="name" placeholder="Name" autocomplete="name">
+                <img class="inputImage" src="./img/person.svg">
+            </div>
+            <div class="inputField">
+                <input class="input user-email" type="email" required id="email" placeholder="Email" autocomplete="email" 
+                    onkeyup="validateEmailAddress()">
+                <img class="inputImage" src="./img/mail.svg">
+            </div>
+            <div class="msgError" id="msgBoxValidateEmail"></div>
+            <div class="inputField">
+                <input class="input" type="password" required id="password" placeholder="Password" minlength="8" autocomplete="new-password"
+                    onfocus="changeLockIcon(this)"
+                    oninput="checkPasswordStrength()">
+                <img onclick="togglePassword('password')" class="inputImage" id="passwordIcon" src="./img/lock.svg">
+            </div>  
+            <div  class="msgError" id="passwordStrengthMessage"></div>          
+            <div class="inputField">
+                <input class="input" type="password" required id="confirm_password" placeholder="Confirm Password" autocomplete="new-password"  
+                    onfocus="changeLockIcon(this)"   
+                    onkeyup="validateConfirmedPassword()">
+                <img onclick="togglePassword('confirm_password')" class="inputImage" id="confirmPasswordIcon" src="./img/lock.svg">
+            </div>
+            <div class="msgError" id="passwordMatchMessage"></div>
+            <div id="msgBox"></div>
+            <div class="checkboxContainerSignup">
+                <button type="button" class="checkbox" onclick="togglePrivacyPolicyCheckbox(this);">
+                    <img class="checkboxImage" src="./img/Rectangle5.svg" data-checked="./img/checked.svg" data-unchecked="./img/Rectangle5.svg">
+                </button>
+                <span>I accept the <a class="privacy-policy-link" href='../privacyPolicyLogin.html?ref=signup'>Privacy Policy</a></span>
+                <input type="checkbox" class="realCheckbox" hidden>
+            </div>                         
+            <div class="buttonContainer">
+                <button type="submit" class="blueBtn btn-Sign-up">Sign up</button>
+            </div> 
+        </form>
+    </div> 
+    <div class="legalNotesNegative">
+        <button onclick="window.location.href='../privacyPolicyLogin.html?ref=signup'">Privacy Policy</button>
+        <button onclick="window.location.href='../legalNoticeLogin.html?ref=signup'">Legal Notice</button>
+    </div>
+</div> 
+<div id="signupModal" class="modal">
+    <div class="modal-content"> 
+      <p>You Signed Up successfully</p>
+    </div>
+</div> 
+</main>
+</html>
+ 

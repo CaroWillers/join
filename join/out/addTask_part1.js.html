@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: addTask_part1.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: addTask_part1.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Asynchronously loads "add task" templates and initializes functionalities.
+ *
+ * This function uses `async` to load templates via `Templates`.
+ * After successful loading, it:
+ *  - Initializes "add task" functionalities with `addTaskInit`.
+ *  - Updates navigation to show "Add Task" with `changeNavigationAddTask`.
+ */
+async function loadAddTasks() {
+    await Templates('add_task');
+    addTaskInit();
+    changeNavigationAddTask()
+}
+
+/**
+ * Initializes functionalities related to adding tasks.
+ *
+ * This function likely performs actions to prepare the "add task" functionality.
+ * It calls `changePriorityColor` for potential default priority color setting.
+ */
+function addTaskInit() {
+    changePriorityColor('mediumPriorityButton');
+    selectedAssignedContacts = [];
+    createdSubtasks = [];
+}
+
+/**
+ * Updates navigation visuals to show the "Add Task" section.
+ *
+ * This function switches the visual selection to the "Add Task" navigation item.
+ * Additionally, it adjusts element visibility based on screen size for mobile.
+ */
+function changeNavigationAddTask() {
+    let addTask = document.getElementById('navAddTask');
+    let board = document.getElementById('navBoard');
+    board.classList.remove('navigation-item-clicked');
+    addTask.classList.add('navigation-item-clicked');
+    if (window.innerWidth &lt; 800) {
+        addTask.children[0].classList.add('d-none');
+        addTask.children[1].classList.remove('d-none');
+        board.children[1].classList.add('d-none');
+        board.children[0].classList.remove('d-none');
+    }
+}
+
+/**
+ * This function conditionally opens the "Add Task" functionality based on screen size.
+ * - For small screens (less than 800px width), it calls the `loadAddTasks` function to handle adding tasks in a compact format.
+ * - For larger screens, it calls the `boardPopupAddTask` function to display a popup for adding tasks).
+ *
+ * @param {string} place The place associated with the task.
+ */
+let boardPlace = "";
+function openAddTaskSmallBtnBoard(place) {
+    boardPlace = place;
+    if (window.innerWidth &lt; 800) {
+        loadAddTasks(boardPlace);
+    } else {
+        boardPopupAddTask(boardPlace);
+    }
+}
+
+/**
+ * This function checks if the title input field is empty or contains only whitespace characters.
+ * @returns {string|boolean} Returns the valid title if it's not empty or whitespace, otherwise returns false.
+ */
+function errorMessageIfEmptyTitle() {
+    let titleInput = document.getElementById('addTaskInputTitle');
+    let errorMessage = document.querySelector('.errorMessageIfEmptyTitle');
+    let title = titleInput.value.trim();
+    if (title === "" || /^\s+$/.test(title)) {
+        errorMessage.style.visibility = 'visible';
+        document.getElementById('addTaskInputTitle').value = '';
+        highlightErrorMessage(errorMessage);
+        return false;
+    } else {
+        errorMessage.style.visibility = 'hidden';
+        return title;
+    }
+}
+
+/**
+ * This function checks if the "Add Task" due date input field is empty and displays an error message if so.
+ * It also handles hiding the error message if the field is filled.
+ *
+ * @returns {string|undefined} If the due date field is not empty, the function returns its value.
+ *                              Otherwise, it returns for error cases is needed).
+ */
+function errorMessageIfEmptyDueDate() {
+    let dueDateInput = document.getElementById('addTaskDueDateInput');
+    let errorMessage = document.querySelector('.errorMessageIfEmptyDueDate');
+    if (dueDateInput.value == "") {
+        errorMessage.style.visibility = 'visible';
+        highlightErrorMessage(errorMessage);
+    } else {
+        errorMessage.style.visibility = 'hidden';
+        return dueDateInput.value;
+    }
+}
+
+let priorities = [];
+
+/**
+ * This function handles priority selection based on the clicked button's ID.
+ * It resets the `priorities` array, retrieves the priority value from the button's data attribute,
+ * and calls the appropriate styling function based on the button ID.
+ *
+ * @param {string} buttonId The ID of the clicked priority button (e.g., "urgentPriorityButton").
+ */
+function changePriorityColor(buttonId) {
+    priorities = [];
+    const button = document.getElementById(buttonId);
+    const priority = button.getAttribute('data-priority');
+    if (buttonId === 'urgentPriorityButton') {
+        urgentPriorityButtonStylingWhenClicked(button);
+    } else if (buttonId === 'mediumPriorityButton') {
+        mediumPriorityButtonStylingWhenClicked(button);
+    } else if (buttonId === 'lowPriorityButton') {
+        lowPriorityButtonStylingWhenClicked(button);
+    }
+    priorities.push(priority);
+}
+
+/**
+ * This function applies styling for the clicked urgent priority button,
+ * highlighting it and resetting styles for other priority buttons.
+ *
+ * @param {Element} button The clicked urgent priority button element.
+ */
+function urgentPriorityButtonStylingWhenClicked(button) {
+    button.classList.replace('urgentPriorityButton', 'clickedUrgentButton');
+    document.getElementById('urgentIcon').classList.add('clickedButtonIcon');
+    resetOtherPriorityButtonStyles('mediumPriorityButton', 'mediumIcon');
+    resetOtherPriorityButtonStyles('lowPriorityButton', 'lowIcon');
+}
+
+/**
+ * This function applies styling for the clicked medium priority button,
+ * highlighting it and resetting styles for other priority buttons.
+ *
+ * @param {Element} button The clicked medium priority button element.
+ */
+function mediumPriorityButtonStylingWhenClicked(button) {
+    button.classList.replace('mediumPriorityButton', 'clickedMediumButton');
+    document.getElementById('mediumIcon').classList.add('clickedButtonIcon');
+    resetOtherPriorityButtonStyles('urgentPriorityButton', 'urgentIcon');
+    resetOtherPriorityButtonStyles('lowPriorityButton', 'lowIcon');
+}
+
+/**
+ * This function applies styling for the clicked low priority button,
+ * highlighting it and resetting styles for other priority buttons.
+ *
+ * @param {Element} button The clicked low priority button element.
+ */
+function lowPriorityButtonStylingWhenClicked(button) {
+    button.classList.replace('lowPriorityButton', 'clickedLowButton');
+    document.getElementById('lowIcon').classList.add('clickedButtonIcon');
+    resetOtherPriorityButtonStyles('urgentPriorityButton', 'urgentIcon');
+    resetOtherPriorityButtonStyles('mediumPriorityButton', 'mediumIcon');
+}
+
+/**
+ * This function resets styling for a specified priority button and its icon.
+ *
+ * @param {string} buttonId The ID of the button to reset styles for.
+ * @param {string} iconId The ID of the icon element associated with the button.
+ */
+function resetOtherPriorityButtonStyles(buttonId, iconId) {
+    document.getElementById(buttonId).classList.remove('clickedMediumButton', 'clickedLowButton', 'clickedUrgentButton');
+    document.getElementById(buttonId).classList.add(buttonId);
+    document.getElementById(iconId).classList.remove('clickedButtonIcon');
+}
+
+let selectedAssignedContacts = []
+
+/**
+ * This function toggles the visibility of the "Assign To" dropdown menu.
+ * If the dropdown is currently hidden, it will be opened. Otherwise, it will be closed.
+ */
+function toggleAssignToDropdown() {
+    var content = document.getElementById("dropdowncontacts");
+    if (content.style.display == "none") {
+        openAssignToDropdown();
+    } else {
+        closeAssignToDropdown();
+    }
+}
+
+/**
+ * This function opens the "Assign To" dropdown menu.
+ * It clears the placeholder text, sets the display to flex, clears the inner HTML, scrolls down the container to ensure visibility, and renders all contacts.
+ */
+function openAssignToDropdown() {
+    document.getElementById("assignContactsDropdown").placeholder = "";
+    document.getElementById('dropdowncontacts').style.display = 'flex';
+    document.getElementById('dropdowncontacts').innerHTML = '';
+    scrollDown();
+    renderAllContacts();
+    searchIndexAssinged();
+}
+
+/**
+ * This function scrolls the element with the ID "addTaskContainer" down by 120 pixels.
+ */
+function scrollDown() {
+    var meineDiv = document.getElementById('addTaskContainer');
+    meineDiv.scrollTop += 120;
+}
+
+/**
+ * This function renders all contacts from the `contacts` array in the "Assign To" dropdown menu.
+ * It first sorts the contacts by first name and then loops through each contact.
+ * For each contact, it checks if it's already assigned (based on `selectedAssignedContacts`).
+ * It then sets the background color, text color, and checkbox source based on the assigned status.
+ * Finally, it adds the contact HTML template to the dropdown container.
+ */
+function renderAllContacts() {
+    sortByFirstName();
+    document.getElementById('dropdowncontacts').innerHTML = "";
+    for (let i = 0; i &lt; localContacts.length; i++) {
+        const contact = localContacts[i];
+        let isAssigned = selectedAssignedContacts.some(item => item.name === `${contact.name} ${contact.surname}`);
+        let backgroundColor = isAssigned ? "rgba(69, 137, 255, 1)" : "white";
+        let textColor = isAssigned ? "white" : "black";
+        let checkBoxSrc = isAssigned ? "./img/assignContactCheckChecked.svg" : "./img/assingContactCheckUnchecked.svg";
+        document.getElementById('dropdowncontacts').innerHTML += renderAllContactsHTMLTemplate(i, backgroundColor, contact, textColor, checkBoxSrc);
+    }
+}
+
+/**
+ * This function closes the "Assign To" dropdown menu.
+ * It sets the placeholder text back to "Select contacts to assign" and hides the dropdown container.
+ */
+function closeAssignToDropdown() {
+    document.getElementById("assignContactsDropdown").placeholder = "Select contacts to assign";
+    document.getElementById('dropdowncontacts').style.display = 'none';
+}
+
+/**
+ * This function changes the source attribute of a checkbox element with a dynamic ID constructed using `assignContactCheckBox(i)`.
+ * The new source points to the "checked" checkbox image.
+ * 
+ * @param {number} i - The index of the contact in the list.
+ */
+function changeCheckBoxStyle(i) {
+    document.getElementById(`assignContactCheckBox(${i})`).src = "./img/assignContactCheckChecked.svg";
+}
+
+/**
+ * This function changes the source attribute of a checkbox element with a dynamic ID constructed using `assignContactCheckBox(i)`.
+ * The new source points to the "unchecked" checkbox image.
+ * 
+ * @param {number} i - The index of the contact in the list.
+ */
+function changeBackCheckBoxStyle(i) {
+    document.getElementById(`assignContactCheckBox(${i})`).src = "./img/assingContactCheckUnchecked.svg";
+}
+
+let filteredContacts = [];
+
+/**
+ * This function handles searching for contacts within the "Assign To" dropdown menu.
+ * It retrieves the search term from the "assignContactsDropdown" element and converts it to lowercase.
+ * If the search term is empty, it renders all contacts again. Otherwise, it filters the `contacts` array based on whether the name or surname (lowercase) starts with the search term.
+ * Finally, it renders the filtered contacts using the `renderFilteredContacts` function.
+ */
+function searchContactToAssign() {
+    let search = document.getElementById('assignContactsDropdown').value.toLowerCase();
+    if (search === '') {
+        renderAllContacts();
+        return;
+    }
+    filteredContacts = localContacts.filter(contact =>
+        contact.name.toLowerCase().startsWith(search) ||
+        contact.surname.toLowerCase().startsWith(search)
+    );
+    renderFilteredContacts(filteredContacts);
+}
+
+/**
+ * This function renders a list of filtered contacts in the "Assign To" dropdown menu.
+ * It takes an array of filtered contacts as input.
+ * It shows the dropdown container, clears its inner HTML, and loops through each filtered contact.
+ * Similar to `renderAllContacts`, it checks the assignment status, sets styles, and adds the contact HTML template (presumably generated by another function `renderFilteredContactsHTMLTemplate`) to the dropdown container.
+ * 
+ * @param {array} filteredContacts - An array of contacts matching the search criteria.
+ */
+function renderFilteredContacts(filteredContacts) {
+    const dropdownContainer = document.getElementById('dropdowncontacts');
+    dropdownContainer.style.display = 'flex';
+    dropdownContainer.innerHTML = '';
+    filteredContacts.forEach((contact, i) => {
+        let isAssigned = selectedAssignedContacts.some(item => item.name === `${contact.name} ${contact.surname}`);
+        let backgroundColor = isAssigned ? "rgba(69, 137, 255, 1)" : "white";
+        let textColor = isAssigned ? "white" : "black";
+        let checkBoxSrc = isAssigned ? "./img/assignContactCheckChecked.svg" : "./img/assingContactCheckUnchecked.svg";
+
+        dropdownContainer.innerHTML += renderFilteredContactsHTMLTemplate(i, backgroundColor, contact, textColor, checkBoxSrc)
+    });
+}
+
+/**
+ * This function handles assigning or unassigning a contact based on the provided index.
+ * @param {number} i - The index of the contact in the list.
+ */
+function assingContact(i) {
+    let search = document.getElementById('assignContactsDropdown').value.toLowerCase();
+    let contact = getSelectedContact(i, search);
+    let { fullName, initials, avatarColor, contactIndex } = getContactRelatedInfo(contact);
+    handleContactAssignment(contactIndex, fullName, initials, avatarColor, i);
+}
+
+/**
+ * This function retrieves the correct contact based on the search value.
+ * @param {number} i - The index of the contact in the list.
+ * @param {string} search - The search value from the assignContactsDropdown input.
+ * @returns {Object} The selected contact object.
+ */
+function getSelectedContact(i, search) {
+    if (search === "") {
+        return localContacts[i];
+    } else {
+        return filteredContacts[i];
+    }
+}
+
+/**
+ * This function retrieves contact-related information such as full name, initials, avatar color, and index in the selected assigned contacts array.
+ * @param {Object} contact - The contact object.
+ * @returns {Object} An object containing full name, initials, avatar color, and index.
+ */
+function getContactRelatedInfo(contact) {
+    let fullName = `${contact.name} ${contact.surname}`;
+    let initials = `${contact.name.charAt(0).toUpperCase()}${contact.surname.charAt(0).toUpperCase()}`;
+    let avatarColor = contact.avatarColor;
+    let contactIndex = selectedAssignedContacts.findIndex(item => item.name === fullName);
+    return { fullName, initials, avatarColor, contactIndex };
+}
+
+/**
+ * This function handles the assignment or unassignment of a contact based on the contact index.
+ * @param {number} contactIndex - The index of the contact in the selectedAssignedContacts array.
+ * @param {string} fullName - The full name of the contact.
+ * @param {string} initials - The initials of the contact.
+ * @param {string} avatarColor - The avatar color of the contact.
+ * @param {number} i - The index of the contact in the list.
+ */
+function handleContactAssignment(contactIndex, fullName, initials, avatarColor, i) {
+    if (contactIndex === -1) {
+        let selectedContact = { name: fullName, initials: initials, avatarColor: avatarColor };
+        selectedAssignedContacts.push(selectedContact);
+        checkAssignContact(i);
+    } else {
+        selectedAssignedContacts.splice(contactIndex, 1);
+        uncheckAssignContact(i);
+    }
+}
+
+/**
+ * This function updates the visual representation of a contact in the "Assign To" dropdown menu to reflect its assigned state (selected).
+ * It targets specific elements based on dynamic IDs constructed using `dropdownEachContact(i)` and `assignToContactName(i)`.
+ * It sets the background color of the contact container, text color of the contact name, and calls `changeCheckBoxStyle` to update the checkbox image (likely to checked).
+ * Finally, it calls `showAvatarsOfSelectedContacts` to potentially update the assigned contacts avatar list.
+ * 
+ * @param {number} i - The index of the contact in the list.
+ */
+function checkAssignContact(i) {
+    document.getElementById(`dropdownEachContact(${i})`).style.backgroundColor = "rgba(69, 137, 255, 1)";
+    document.getElementById(`assignToContactName(${i})`).style.color = "white";
+    changeCheckBoxStyle(i);
+    showAvatarsOfSelectedContacts();
+}
+
+/**
+ * This function updates the visual representation of a contact in the "Assign To" dropdown menu to reflect its unassigned state (unselected).
+ * It targets specific elements based on dynamic IDs constructed using `dropdownEachContact(i)` and `assignToContactName(i)`.
+ * It sets the background color of the contact container and text color of the contact name back to defaults.
+ * It calls `changeBackCheckBoxStyle` to update the checkbox image (likely to unchecked).
+ * Finally, it calls `showAvatarsOfSelectedContacts` to potentially update the assigned contacts avatar list.
+ * 
+ * @param {number} i - The index of the contact in the list.
+ */
+function uncheckAssignContact(i) {
+    document.getElementById(`dropdownEachContact(${i})`).style.backgroundColor = "white";
+    document.getElementById(`assignToContactName(${i})`).style.color = "black";
+    changeBackCheckBoxStyle(i);
+    showAvatarsOfSelectedContacts();
+}
+
+/**
+ * This function updates the list of assigned contacts' avatars displayed below the dropdown menu.
+ * It first sorts the `selectedAssignedContacts` array by name in ascending order using `localeCompare`.
+ * It then shows the container for the avatar list, clears its inner HTML, and loops through each assigned contact.
+ * For each contact, it constructs the avatar HTML element with the contact's initials and background color set to the contact's avatar color.
+ * Finally, it adds the avatar HTML to the container.
+ */
+function showAvatarsOfSelectedContacts() {
+    selectedAssignedContacts.sort((a, b) => {
+        return a.name.localeCompare(b.name);
+    });
+    document.getElementById('avatarsOfSelectedContacts').style.display = "flex";
+    document.getElementById('avatarsOfSelectedContacts').innerHTML = "";
+    for (let i = 0; i &lt; selectedAssignedContacts.length; i++) {
+        const contact = selectedAssignedContacts[i];
+        document.getElementById('avatarsOfSelectedContacts').innerHTML += `
+    &lt;div class="assignToContactAvatar" style="background-color: ${contact['avatarColor']};">
+    ${contact['initials']}
+    &lt;/div>
+    `;
+    }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#CreatedPopUpOptions">CreatedPopUpOptions</a></li><li><a href="global.html#EditTemplate">EditTemplate</a></li><li><a href="global.html#NoMatchFound">NoMatchFound</a></li><li><a href="global.html#SubtaskStatus">SubtaskStatus</a></li><li><a href="global.html#TaskCadBigTemplate">TaskCadBigTemplate</a></li><li><a href="global.html#TaskTextInEdit">TaskTextInEdit</a></li><li><a href="global.html#TemplateGreetMobile">TemplateGreetMobile</a></li><li><a href="global.html#TemplateSubtaskProgressbar">TemplateSubtaskProgressbar</a></li><li><a href="global.html#Templates">Templates</a></li><li><a href="global.html#UpdateTaskInRemote">UpdateTaskInRemote</a></li><li><a href="global.html#UserInitals">UserInitals</a></li><li><a href="global.html#addContactButtonsCancelAndCreateButtonsHTMLTemplate">addContactButtonsCancelAndCreateButtonsHTMLTemplate</a></li><li><a href="global.html#addTaskInit">addTaskInit</a></li><li><a href="global.html#addTaskToBoard">addTaskToBoard</a></li><li><a href="global.html#addUser">addUser</a></li><li><a href="global.html#allowDrop">allowDrop</a></li><li><a href="global.html#assignedInitals">assignedInitals</a></li><li><a href="global.html#assingContact">assingContact</a></li><li><a href="global.html#bigCard">bigCard</a></li><li><a href="global.html#bigCardAssigned">bigCardAssigned</a></li><li><a href="global.html#bigCardAssignedTemplate">bigCardAssignedTemplate</a></li><li><a href="global.html#bigCardSubtaskTemplate">bigCardSubtaskTemplate</a></li><li><a href="global.html#bigCardSubtasks">bigCardSubtasks</a></li><li><a href="global.html#bigCardSubtasksCheck">bigCardSubtasksCheck</a></li><li><a href="global.html#boardPlace">boardPlace</a></li><li><a href="global.html#boardPopupAddTask">boardPopupAddTask</a></li><li><a href="global.html#boardPopupAddTaskWindow">boardPopupAddTaskWindow</a></li><li><a href="global.html#boardTaskNumber">boardTaskNumber</a></li><li><a href="global.html#buildTemplateForArrayInput">buildTemplateForArrayInput</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#cardTemplate">cardTemplate</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#changeBackCheckBoxStyle">changeBackCheckBoxStyle</a></li><li><a href="global.html#changeCheckBoxStyle">changeCheckBoxStyle</a></li><li><a href="global.html#changeContactButtonColorAsClicked">changeContactButtonColorAsClicked</a></li><li><a href="global.html#changeContactButtonEmailColorToWhite">changeContactButtonEmailColorToWhite</a></li><li><a href="global.html#changeLockIcon">changeLockIcon</a></li><li><a href="global.html#changeNavigation">changeNavigation</a></li><li><a href="global.html#changeNavigationAddTask">changeNavigationAddTask</a></li><li><a href="global.html#changeNavigationHighlightSummary">changeNavigationHighlightSummary</a></li><li><a href="global.html#changeNavigationPrivacyPolicy">changeNavigationPrivacyPolicy</a></li><li><a href="global.html#changePriorityColor">changePriorityColor</a></li><li><a href="global.html#checkAssignContact">checkAssignContact</a></li><li><a href="global.html#checkCards">checkCards</a></li><li><a href="global.html#checkErrors">checkErrors</a></li><li><a href="global.html#checkForDuplicateEmail">checkForDuplicateEmail</a></li><li><a href="global.html#checkIfEmailExists">checkIfEmailExists</a></li><li><a href="global.html#checkIfUserIsAddedAsContact">checkIfUserIsAddedAsContact</a></li><li><a href="global.html#checkInputValue">checkInputValue</a></li><li><a href="global.html#checkPasswordStrength">checkPasswordStrength</a></li><li><a href="global.html#checkPrivacyPolicy">checkPrivacyPolicy</a></li><li><a href="global.html#clearAddContactForm">clearAddContactForm</a></li><li><a href="global.html#clearPasswordError">clearPasswordError</a></li><li><a href="global.html#clearSubtaskInputField">clearSubtaskInputField</a></li><li><a href="global.html#clickedButtonEmailColors">clickedButtonEmailColors</a></li><li><a href="global.html#clickedButtons">clickedButtons</a></li><li><a href="global.html#clickedLegalPart">clickedLegalPart</a></li><li><a href="global.html#closeAssignToDropdown">closeAssignToDropdown</a></li><li><a href="global.html#closeCard">closeCard</a></li><li><a href="global.html#closeContactInfo">closeContactInfo</a></li><li><a href="global.html#closeDropdowenTask">closeDropdowenTask</a></li><li><a href="global.html#closeDropdown">closeDropdown</a></li><li><a href="global.html#closeTaskCategoryDropdown">closeTaskCategoryDropdown</a></li><li><a href="global.html#createCardObject">createCardObject</a></li><li><a href="global.html#createCategories">createCategories</a></li><li><a href="global.html#createContact">createContact</a></li><li><a href="global.html#createNewContactDataSet">createNewContactDataSet</a></li><li><a href="global.html#createTask">createTask</a></li><li><a href="global.html#createUserAsContact">createUserAsContact</a></li><li><a href="global.html#currentDraggedElement">currentDraggedElement</a></li><li><a href="global.html#deleteContact">deleteContact</a></li><li><a href="global.html#deleteCreatedSubtask">deleteCreatedSubtask</a></li><li><a href="global.html#deleteTask">deleteTask</a></li><li><a href="global.html#deleteUneditTask">deleteUneditTask</a></li><li><a href="global.html#displayClosestDueDate">displayClosestDueDate</a></li><li><a href="global.html#doNotClose">doNotClose</a></li><li><a href="global.html#doneCardUpdate">doneCardUpdate</a></li><li><a href="global.html#doneNumber">doneNumber</a></li><li><a href="global.html#drop">drop</a></li><li><a href="global.html#dropMobile">dropMobile</a></li><li><a href="global.html#dropdowenTask">dropdowenTask</a></li><li><a href="global.html#dropdownHelp">dropdownHelp</a></li><li><a href="global.html#dropdownLegalNotice">dropdownLegalNotice</a></li><li><a href="global.html#dropdownPrivacyPolicy">dropdownPrivacyPolicy</a></li><li><a href="global.html#editContactDeleteAndSaveButtonLayoutHTMLTemplate">editContactDeleteAndSaveButtonLayoutHTMLTemplate</a></li><li><a href="global.html#editCreatedSubtask">editCreatedSubtask</a></li><li><a href="global.html#editTask">editTask</a></li><li><a href="global.html#editTaskDone">editTaskDone</a></li><li><a href="global.html#emptyArrays">emptyArrays</a></li><li><a href="global.html#errorMessageIfEmptyCategory">errorMessageIfEmptyCategory</a></li><li><a href="global.html#errorMessageIfEmptyDueDate">errorMessageIfEmptyDueDate</a></li><li><a href="global.html#errorMessageIfEmptyTitle">errorMessageIfEmptyTitle</a></li><li><a href="global.html#feedbackCardUpdate">feedbackCardUpdate</a></li><li><a href="global.html#feedbackNumber">feedbackNumber</a></li><li><a href="global.html#formatContactName">formatContactName</a></li><li><a href="global.html#formatDueDate">formatDueDate</a></li><li><a href="global.html#getCategoryColor">getCategoryColor</a></li><li><a href="global.html#getContactData">getContactData</a></li><li><a href="global.html#getContactRelatedInfo">getContactRelatedInfo</a></li><li><a href="global.html#getIndexByNameSurname">getIndexByNameSurname</a></li><li><a href="global.html#getOldestOverdueDate">getOldestOverdueDate</a></li><li><a href="global.html#getPriorityImagePath">getPriorityImagePath</a></li><li><a href="global.html#getQueryParam">getQueryParam</a></li><li><a href="global.html#getSelectedContact">getSelectedContact</a></li><li><a href="global.html#getTaskData">getTaskData</a></li><li><a href="global.html#giveId">giveId</a></li><li><a href="global.html#goBack">goBack</a></li><li><a href="global.html#greetUser">greetUser</a></li><li><a href="global.html#greetUserMobile">greetUserMobile</a></li><li><a href="global.html#guestLogin">guestLogin</a></li><li><a href="global.html#handleContactAssignment">handleContactAssignment</a></li><li><a href="global.html#handleRememberMeChange">handleRememberMeChange</a></li><li><a href="global.html#hideAddContactCard">hideAddContactCard</a></li><li><a href="global.html#hideContactEditDeleteMenu">hideContactEditDeleteMenu</a></li><li><a href="global.html#highlightCreatedContact">highlightCreatedContact</a></li><li><a href="global.html#highlightErrorMessage">highlightErrorMessage</a></li><li><a href="global.html#includeAddTask">includeAddTask</a></li><li><a href="global.html#includeHTML">includeHTML</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initContacts">initContacts</a></li><li><a href="global.html#insertAnimation">insertAnimation</a></li><li><a href="global.html#isAssignedEdit">isAssignedEdit</a></li><li><a href="global.html#legalNoticeHiglite">legalNoticeHiglite</a></li><li><a href="global.html#loadAddTasks">loadAddTasks</a></li><li><a href="global.html#loadBoard">loadBoard</a></li><li><a href="global.html#loadContacts">loadContacts</a></li><li><a href="global.html#loadRememberedPassword">loadRememberedPassword</a></li><li><a href="global.html#loadRemoteContactsOfLoggedInUser">loadRemoteContactsOfLoggedInUser</a></li><li><a href="global.html#loadTasks">loadTasks</a></li><li><a href="global.html#loadUsers">loadUsers</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#lowPriorityButtonStylingWhenClicked">lowPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#matchingCategoryCheck">matchingCategoryCheck</a></li><li><a href="global.html#mediumPriorityButtonStylingWhenClicked">mediumPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#mobileGreeting">mobileGreeting</a></li><li><a href="global.html#navigateTo">navigateTo</a></li><li><a href="global.html#navigationClick">navigationClick</a></li><li><a href="global.html#navigationClickImg">navigationClickImg</a></li><li><a href="global.html#newContactDataSetForArray">newContactDataSetForArray</a></li><li><a href="global.html#openAssignToDropdown">openAssignToDropdown</a></li><li><a href="global.html#openContactInfo">openContactInfo</a></li><li><a href="global.html#openContactInfoHTMLTemplate">openContactInfoHTMLTemplate</a></li><li><a href="global.html#openCreatedSubtaskBox">openCreatedSubtaskBox</a></li><li><a href="global.html#openDropdown">openDropdown</a></li><li><a href="global.html#openTaskCategoryDropdown">openTaskCategoryDropdown</a></li><li><a href="global.html#outputDeadlineText">outputDeadlineText</a></li><li><a href="global.html#outputDueDate">outputDueDate</a></li><li><a href="global.html#priorityEdit">priorityEdit</a></li><li><a href="global.html#priorityImgCheck">priorityImgCheck</a></li><li><a href="global.html#privacyPolicyHighlight">privacyPolicyHighlight</a></li><li><a href="global.html#progressCardUpdate">progressCardUpdate</a></li><li><a href="global.html#progressNumber">progressNumber</a></li><li><a href="global.html#progressbarCompetedRate">progressbarCompetedRate</a></li><li><a href="global.html#redesignAddContactCardToEditContactCard">redesignAddContactCardToEditContactCard</a></li><li><a href="global.html#rememberPassword">rememberPassword</a></li><li><a href="global.html#removeClickedLegalPart">removeClickedLegalPart</a></li><li><a href="global.html#removeNavHighlightLegalPartOnDropdown">removeNavHighlightLegalPartOnDropdown</a></li><li><a href="global.html#removeNavHighlightOnDropdown">removeNavHighlightOnDropdown</a></li><li><a href="global.html#removeNavigationClick">removeNavigationClick</a></li><li><a href="global.html#renderAddContactLayout">renderAddContactLayout</a></li><li><a href="global.html#renderAllContacts">renderAllContacts</a></li><li><a href="global.html#renderContactCategory">renderContactCategory</a></li><li><a href="global.html#renderContactCategoryAndEachContact">renderContactCategoryAndEachContact</a></li><li><a href="global.html#renderContactList">renderContactList</a></li><li><a href="global.html#renderEachContact">renderEachContact</a></li><li><a href="global.html#renderFilteredContacts">renderFilteredContacts</a></li><li><a href="global.html#resetAddTaskForm">resetAddTaskForm</a></li><li><a href="global.html#resetContactButtonColor">resetContactButtonColor</a></li><li><a href="global.html#resetContactButtonEmailColor">resetContactButtonEmailColor</a></li><li><a href="global.html#resetCreateTaskFormInputs">resetCreateTaskFormInputs</a></li><li><a href="global.html#resetLastClickedContactButtonColor">resetLastClickedContactButtonColor</a></li><li><a href="global.html#resetLastClickedContactButtonEmailColor">resetLastClickedContactButtonEmailColor</a></li><li><a href="global.html#resetNavigationItems">resetNavigationItems</a></li><li><a href="global.html#resetOtherPriorityButtonStyles">resetOtherPriorityButtonStyles</a></li><li><a href="global.html#saveEditSubtaskInput">saveEditSubtaskInput</a></li><li><a href="global.html#saveNewUser">saveNewUser</a></li><li><a href="global.html#saveSubtaskInput">saveSubtaskInput</a></li><li><a href="global.html#scrollDown">scrollDown</a></li><li><a href="global.html#scrollToAnchor">scrollToAnchor</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchContactToAssign">searchContactToAssign</a></li><li><a href="global.html#selectTaskCategory">selectTaskCategory</a></li><li><a href="global.html#separateCards">separateCards</a></li><li><a href="global.html#setButtonColorAsClicked">setButtonColorAsClicked</a></li><li><a href="global.html#setEmailColorAsClicked">setEmailColorAsClicked</a></li><li><a href="global.html#setGuestLogin">setGuestLogin</a></li><li><a href="global.html#setUserLogin">setUserLogin</a></li><li><a href="global.html#showAddContactCard">showAddContactCard</a></li><li><a href="global.html#showAvatarsOfSelectedContacts">showAvatarsOfSelectedContacts</a></li><li><a href="global.html#showContactCreatedPopUp">showContactCreatedPopUp</a></li><li><a href="global.html#showContactEditDeleteMenu">showContactEditDeleteMenu</a></li><li><a href="global.html#showCurrentContactDetails">showCurrentContactDetails</a></li><li><a href="global.html#showEditAndDeleteMenuOnMobile">showEditAndDeleteMenuOnMobile</a></li><li><a href="global.html#showEditContact">showEditContact</a></li><li><a href="global.html#showTaskCreatedPopUp">showTaskCreatedPopUp</a></li><li><a href="global.html#showTaskCreatedPopUpBoard">showTaskCreatedPopUpBoard</a></li><li><a href="global.html#sortByFirstName">sortByFirstName</a></li><li><a href="global.html#sortUpcomingCards">sortUpcomingCards</a></li><li><a href="global.html#startAnimation">startAnimation</a></li><li><a href="global.html#startDragging">startDragging</a></li><li><a href="global.html#subtaskCompleted">subtaskCompleted</a></li><li><a href="global.html#subtaskEdit">subtaskEdit</a></li><li><a href="global.html#subtaskNotCompleted">subtaskNotCompleted</a></li><li><a href="global.html#successfulLogin">successfulLogin</a></li><li><a href="global.html#successfulSignup">successfulSignup</a></li><li><a href="global.html#summaryLoad">summaryLoad</a></li><li><a href="global.html#summaryLoadNumbers">summaryLoadNumbers</a></li><li><a href="global.html#templateOkBtn">templateOkBtn</a></li><li><a href="global.html#todoCardUpdate">todoCardUpdate</a></li><li><a href="global.html#todoNumber">todoNumber</a></li><li><a href="global.html#toggleAssignToDropdown">toggleAssignToDropdown</a></li><li><a href="global.html#toggleCheckbox">toggleCheckbox</a></li><li><a href="global.html#toggleContactButtonColor">toggleContactButtonColor</a></li><li><a href="global.html#toggleContactButtonEmailColor">toggleContactButtonEmailColor</a></li><li><a href="global.html#toggleIndex">toggleIndex</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePrivacyPolicyCheckbox">togglePrivacyPolicyCheckbox</a></li><li><a href="global.html#toggleRememberMeCheckbox">toggleRememberMeCheckbox</a></li><li><a href="global.html#toggleSelectTaskCategoryDropdown">toggleSelectTaskCategoryDropdown</a></li><li><a href="global.html#uncheckAssignContact">uncheckAssignContact</a></li><li><a href="global.html#unclickCreatedContact">unclickCreatedContact</a></li><li><a href="global.html#updateCards">updateCards</a></li><li><a href="global.html#updateContact">updateContact</a></li><li><a href="global.html#updateDueDateContainers">updateDueDateContainers</a></li><li><a href="global.html#updateUserContactsInRemote">updateUserContactsInRemote</a></li><li><a href="global.html#updateUserContactsInRemoteAfterRegistration">updateUserContactsInRemoteAfterRegistration</a></li><li><a href="global.html#urgentButtonColor">urgentButtonColor</a></li><li><a href="global.html#urgentNumber">urgentNumber</a></li><li><a href="global.html#urgentPriorityButtonStylingWhenClicked">urgentPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#validateConfirmedPassword">validateConfirmedPassword</a></li><li><a href="global.html#validateEmailAddress">validateEmailAddress</a></li><li><a href="global.html#validateFormFields">validateFormFields</a></li><li><a href="global.html#validateTaskData">validateTaskData</a></li><li><a href="global.html#wrongPasswordMessage">wrongPasswordMessage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue May 07 2024 10:05:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

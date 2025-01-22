@@ -1,0 +1,1062 @@
+/*  Contacts ----------------------------------------------------- */
+
+.contactsWrapper {
+    display: flex;
+    position: relative;
+    width: 100vw;
+    height: calc(100vh - 10rem);
+    overflow: hidden;
+    padding-right: 4px;
+    padding-left: 4px;
+}
+
+.contactsContainer {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    padding: 24px;
+    overflow: scroll;
+}
+
+/* Contact list */
+.contactList {
+    height: 100%;
+    width: 100%;
+}
+
+.contactBoxForEachLetter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.sectionByFirstLetter {
+    display: flex;
+    width: 100%;
+    padding: 17px 36px 17px 36px;
+}
+
+.contactsSeparator {
+    height: 1px;
+    width: 100%;
+    background-color: rgba(209, 209, 209, 1);
+}
+
+/* Each Contact in contact list */
+.contact {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 35px;
+    padding: 15px 24px 15px 24px;
+}
+
+.contactAvatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 42px;
+    width: 42px;
+    background-color: rgba(255, 122, 0, 1);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 1);
+    font-size: 12px;
+    line-height: 14px;
+    color: white;
+}
+
+.contactNameAndEmail {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 42px;
+    gap: 5px;
+}
+
+.contactName {
+    font-size: 19px;
+    line-height: 23px;
+}
+
+.contactEmail {
+    font-size: 16px;
+    line-height: 19px;
+    color: rgba(69, 137, 255, 1);
+}
+
+/* Add Contact Button in contact list window */
+.addContactButtonContainer {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+}
+
+.addContactButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 64px;
+    width: 64px;
+    border-radius: 10px;
+    border: 1px solid rgba(69, 137, 255, 1);
+    background-color: rgba(69, 137, 255, 1);
+    filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.addContactButton p {
+    display: none;
+    font-size: 23px;
+    line-height: 28px;
+    color: white;
+    font-weight: 400;
+}
+
+.addContactButton img {
+    height: 32px;
+    width: 32px;
+}
+
+.addContactButton:active {
+    background-color: rgba(0, 93, 255, 1);
+    border: none;
+}
+
+/* Contact Details Container when clicking on each Contact */
+.contactDetailsContainer {
+    position: fixed;
+    top: 80px;
+    left: 0px;
+    height: calc(100% - 160px);
+    width: 100%;
+    background-color: white;
+    display: none;
+    z-index: 6;
+    padding: 64px 24px 0px 24px;
+}
+
+.showContactDetailsContainer {
+    display: flex;
+}
+
+.contactInfoBox {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 21px;
+}
+
+.contactInfoHeadlineAndBackButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.contactInfoHeadlineMobile {
+    display: flex;
+    font-size: 19px;
+    line-height: 23px;
+    font-weight: 700;
+}
+
+.contactInfoHeadlineDesktop {
+    display: none;
+}
+
+.contactInfoBackButton {
+    display: flex;
+}
+
+.contactInfoContactDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 21px;
+}
+
+.contactInfoAvatarAndName {
+    display: flex;
+    height: 80px;
+    gap: 20px;
+}
+
+.contactInfoAvatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 1);
+    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.16));
+    background-color: rgba(255, 122, 0, 1);
+    color: white;
+    font-size: 27px;
+    line-height: 32px;
+}
+
+.contactInfoName {
+    display: flex;
+    align-items: center;
+    font-size: 33px;
+    line-height: 40px;
+}
+
+.contactInfoEmailAndPhone {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.contactInfoEmail {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 16px;
+    line-height: 19px;
+}
+
+.contactInfoEmail p {
+    font-weight: 700;
+}
+
+.contactInfoEmail a {
+    color: rgba(0, 124, 238, 1);
+    text-decoration: none;
+}
+
+.contactInfoPhone {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 16px;
+    line-height: 19px;
+}
+
+.contactInfoPhone p {
+    font-weight: 700;
+}
+
+/* Edit & Delete Container that slides in on Mobile */
+.editContactMenuContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    top: 0px;
+    height: 100%;
+    width: 100%;
+    padding-bottom: 24px;
+    padding-right: 24px;
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0);
+    right: -100%;
+    transition: right 0.125s ease;
+    z-index: 11
+}
+
+.editContactMenu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    width: 116px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 1);
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+    border-radius: 20px 20px 0px 20px;
+}
+
+.editContact {
+    display: flex;
+    height: 40px;
+    width: 96px;
+    justify-content: flex-start;
+    padding: 8px;
+    gap: 8px;
+}
+
+.editContact:active {
+    background-color: rgba(227, 238, 255, 1);
+    color: rgba(0, 93, 255, 1);
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.deleteContact {
+    display: flex;
+    height: 40px;
+    width: 96px;
+    justify-content: flex-start;
+    padding: 8px;
+    gap: 8px;
+}
+
+.deleteContact:active {
+    background-color: rgba(227, 238, 255, 1);
+    color: rgba(0, 93, 255, 1);
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 8px 6px 8px 6px;
+}
+
+.showEditContactMenu {
+    right: 0px;
+}
+
+/* Edit & Delete Container in Contact Details on Desktop */
+.editContactMenuDesktop {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    display: none;
+}
+
+/* Create & Edit Contact Card */
+.addEditContactContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.6);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    padding: 8px 16px 8px 16px;
+    display: none;
+}
+
+.showAddEditContactContainer {
+    right: 15px !important;
+    transition: right 0.125s ease;
+}
+
+.addEditContactCard {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: -100%;
+    height: calc(100% - 168px);
+    width: calc(100% - 30px);
+    border-radius: 30px;
+    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.16));
+    transition: right 0.125s ease;
+}
+
+.contactCardTopSection {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    background-color: rgba(0, 93, 255, 1);
+    height: 40%;
+    width: 100%;
+    border-radius: 30px 30px 0px 0px;
+}
+
+.closeAddEditContactCard {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+}
+
+.closeAddEditContactCard:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.addContactLogo {
+    display: none;
+}
+
+.addAndEditContactHeadline {
+    color: white;
+    font-size: 47px;
+    line-height: 56px;
+    font-weight: 700;
+}
+
+.addContactSubheadline {
+    color: white;
+    font-size: 21px;
+    line-height: 25px;
+    font-weight: 400;
+}
+
+.avatarIcon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    left: calc(50% - 60px);
+    top: calc(40% - 60px);
+    height: 120px;
+    width: 120px;
+    background-color: rgba(209, 209, 209, 1);
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 1);
+    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.1));
+    font-size: 32px;
+    line-height: 38px;
+    color: white;
+    font-weight: 400;
+}
+
+.avatarIcon img {
+    height: 64px;
+    width: 64px;
+}
+
+.contactCardBottomSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    height: 60%;
+    width: 100%;
+    border-radius: 0px 0px 30px 30px;
+    padding-top: 24px;
+}
+
+.addEditInputForm {
+    display: flex;
+    flex-direction: column;
+    height: 66%;
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+    gap: 60px;
+}
+
+.addContactContactDetails {
+    display: flex;
+    flex-direction: column;
+    height: 60%;
+    width: 100%;
+    gap: 8px;
+}
+
+.addContactDetailsInput {
+    border: none;
+    width: 100%;
+    border-bottom: 1px solid rgb(209, 209, 209);
+    height: 41px;
+    padding: 12px 16px 12px 16px;
+    font-size: 19px;
+    line-height: 23px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right 0px center;
+    background-origin: content-box;
+}
+
+.addContactDetailsNameInput {
+    background-image: url('../img/addContactNameIcon.svg');
+}
+
+.addContactDetailsEmailInput {
+    background-image: url('../img/addContactEmailIcon.svg');
+}
+
+.addContactDetailsPhoneInput {
+    background-image: url('../img/addContactPhoneIcon.svg');
+}
+
+.addContactDetailsInput::placeholder {
+    color: rgb(209, 209, 209);
+}
+
+.addContactDetailsInput:hover {
+    cursor: pointer;
+}
+
+.addContactDetailsInput:focus {
+    border-bottom-color: rgba(0, 93, 255, 1);
+    outline: none;
+}
+
+.addEditContactButtons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.createContactButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    width: 173px;
+    border-radius: 10px;
+    padding: 12px 8px 12px 8px;
+    background-color: rgba(69, 137, 255, 1);
+    color: white;
+    gap: 4px;
+    border: none;
+    filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.createContactButton p {
+    font-size: 19px;
+    font-weight: 400;
+}
+
+.createContactButton img {
+    height: 24px
+}
+
+.createContactButton:hover {
+    cursor: pointer;
+}
+
+.createContactButton:active {
+    background-color: rgba(0, 93, 255, 1);
+    border: none;
+}
+
+
+/* Create & Edit Contact Card - add Cancel-Button for Desktop */
+.cancelCreateContactButton {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    width: 136px;
+    padding: 16px 10px 16px 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(100, 113, 136, 1);
+    background-color: white;
+    gap: 10px;
+}
+
+.cancelCreateContactButton p {
+    font-size: 23px;
+    font-weight: 400;
+    color: rgba(100, 113, 136, 1);
+}
+
+.cancelCreateContactButton:hover p,
+.cancelCreateContactButton:hover .taskIcon {
+    color: var(--maincolor);
+}
+
+.cancelCreateContactButton img {
+    height: 24px
+}
+
+.cancelCreateContactButton:hover {
+    cursor: pointer;
+    border: 2px solid rgba(69, 137, 255, 1);
+    filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+/* Edit Contact Card - add Save and Delete Buttons */
+.saveEditContactButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    width: 86px;
+    border-radius: 10px;
+    padding: 12px 8px 12px 8px;
+    background-color: rgba(69, 137, 255, 1);
+    color: white;
+    gap: 4px;
+    border: none;
+    filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.saveEditContactButton p {
+    font-size: 19px;
+    font-weight: 400;
+}
+
+.saveEditContactButton img {
+    height: 24px
+}
+
+.saveEditContactButton:hover {
+    cursor: pointer;
+}
+
+.deleteEditContactButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    width: 104px;
+    padding: 12px 16px 12px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(66, 82, 110, 1);
+    background-color: white;
+}
+
+.deleteEditContactButton p {
+    font-size: 19px;
+    font-weight: 400;
+    color: rgba(66, 82, 110, 1);
+}
+
+.deleteEditContactButton:hover p {
+    color: var(--maincolor);
+}
+
+/* Pop-Up when new Contact is created */
+.contactCreatedButtonContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: -100%;
+    transition: bottom 0.250s ease;
+    z-index: 12;
+    padding-top: 50%;
+}
+
+.contactCreatedButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 74px;
+    width: 326px;
+    background-color: rgba(69, 137, 255, 1);
+    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.15));
+    border-radius: 20px;
+}
+
+.contactCreatedButton p {
+    font-size: 21px;
+    line-height: 25px;
+    color: rgba(255, 255, 255, 1);
+}
+
+.showContactCreatedButtonContainer {
+    bottom: 0;
+}
+
+.d-flex {
+    display: flex;
+}
+
+@media (max-width: 360px) {
+    .contactName {
+        font-size: 16px;
+    }
+
+    .contactEmail {
+        font-size: 15px;
+    }
+
+    .addAndEditContactHeadline {
+        font-size: 42px;
+    }
+
+    .addContactSubheadline {
+        font-size: 19px;
+    }
+}
+
+@media (min-width: 800px) {
+    .contactsWrapper {
+        display: flex;
+        position: relative;
+        width: calc(100vw - 200px);
+        height: calc(100vh - 68px);
+        overflow: hidden;
+    }
+
+    .contactsContainer {
+        display: flex;
+        position: relative;
+        width: 456px;
+        height: 100%;
+        background-color: white;
+        filter: drop-shadow(4px 0px 6px rgba(0, 0, 0, 0.08));
+        overflow: unset;
+        padding: 0px;
+        padding-left: 4px;
+        padding-right: 4px;
+
+    }
+
+    .contactList {
+        padding-top: 90px;
+        overflow-y: auto;
+        padding-bottom: 12px;
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+
+    .contactList::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .contactList::-webkit-scrollbar-thumb {
+        background-color: rgba(168, 168, 168, 1);
+    }
+
+    .contactList::-webkit-scrollbar-button {
+        height: 24px;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .contactList::-webkit-scrollbar-button:start {
+        background-image: url('../img/scrollButtonUp.svg');
+    }
+
+    .contactList::-webkit-scrollbar-button:end {
+        background-image: url('../img/scrollButtonDown.svg');
+    }
+
+    .contactList::-webkit-scrollbar-button:decrement {
+        display: flex;
+    }
+
+    .contactList::-webkit-scrollbar-button:increment {
+        display: flex;
+    }
+
+    .contact:hover:not(.contactClicked) {
+        cursor: pointer;
+        background-color: rgba(210, 227, 255, 1);
+        border-radius: 10px;
+    }
+
+    .contactClicked {
+        background-color: rgba(69, 137, 255, 1);
+        color: white !important;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .addContactButtonContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        top: 0px;
+        background-color: white;
+        left: 15px;
+        height: 85px;
+        padding: 32px 12px 16px 12px;
+    }
+
+    .addContactButton {
+        position: unset;
+        height: 56px;
+        width: 378px;
+        padding: 16px 10px 16px 10px;
+        gap: 10px;
+        filter: none;
+    }
+
+    .addContactButton:hover {
+        cursor: pointer;
+        background-color: rgba(0, 93, 255, 1);
+        filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .addContactButton p {
+        display: flex;
+    }
+
+    .contactDetailsContainer {
+        width: 70%;
+        height: 100%;
+        left: 100%;
+        padding-left: 56px;
+        background-color: transparent;
+        transition: left 0.4s ease;
+        display: flex;
+        z-index: 0;
+    }
+
+    .showContactDetailsContainer {
+        left: calc(200px + 480px);
+    }
+
+    .contactInfoHeadlineAndBackButton {
+        display: none;
+    }
+
+    .contactInfoHeadlineDesktop {
+        display: flex;
+        font-weight: 700;
+        font-size: 23px;
+        line-height: 28px;
+    }
+
+    .contactInfoAvatarAndName {
+        display: flex;
+        height: 120px;
+        gap: 54px;
+        align-items: center;
+    }
+
+    .contactInfoAvatar {
+        height: 120px;
+        width: 120px;
+        font-size: 47px;
+        line-height: 56px;
+    }
+
+    .contactInfoName {
+        font-size: 47px;
+        line-height: 56px;
+        font-weight: 500;
+    }
+
+    .editContactMenuContainer {
+        display: none;
+    }
+
+    .editContactMenu {
+        display: none;
+    }
+
+    .editContactMenuDesktop {
+        display: flex;
+        gap: 12px;
+    }
+
+    #editContactButtonContainer {
+        display: none;
+    }
+
+    .editContact {
+        display: flex;
+        align-items: center;
+        height: 24px;
+        width: 61px;
+        justify-content: flex-start;
+        padding: 0px;
+        gap: 8px;
+    }
+
+    .editContact:hover {
+        cursor: pointer;
+        font-weight: 700;
+        color: rgba(0, 93, 255, 1);
+    }
+
+    .editContact:active {
+        background-color: transparent;
+        color: rgba(0, 93, 255, 1);
+        font-weight: 700;
+        border-radius: 0px;
+        padding: 0px;
+    }
+
+    .editGuestContact {
+        display: flex;
+        align-items: center;
+        height: 24px;
+        width: 61px;
+        justify-content: flex-start;
+        padding: 0px;
+        gap: 8px;
+        color: rgba(0, 0, 0, 0.2);
+    }
+
+    .editGuestContact img {
+        filter: brightness(1.8) saturate(0%);
+    }
+
+    .editGuestContact:hover {
+        cursor: not-allowed;
+    }
+
+    .deleteContact {
+        display: flex;
+        height: 24px;
+        width: 81px;
+        justify-content: flex-start;
+        padding: 0px;
+        gap: 8px;
+    }
+
+    .deleteContact:hover {
+        cursor: pointer;
+        font-weight: 700;
+        color: rgba(0, 93, 255, 1)
+    }
+
+    .deleteContact:active {
+        background-color: transparent;
+        color: rgba(0, 93, 255, 1);
+        font-weight: 700;
+        border-radius: 0px;
+        padding: 0px;
+    }
+
+    .deleteGuestContact {
+        display: flex;
+        height: 24px;
+        width: 81px;
+        justify-content: flex-start;
+        padding: 0px;
+        gap: 8px;
+        color: rgba(0, 0, 0, 0.2);
+    }
+
+    .deleteGuestContact:hover {
+        cursor: not-allowed;
+    }
+
+    .deleteGuestContact img {
+        filter: brightness(1.8) saturate(0%);
+    }
+
+    .addEditContactContainer {
+        padding: 0;
+        right: 0;
+        justify-content: flex-end;
+    }
+
+    .showAddEditContactContainer {
+        right: 0 !important;
+        transition: right 0.3s ease;
+    }
+
+    .addEditContactCard {
+        width: 584px;
+        border-radius: 30px 0px 30px 30px;
+        height: 100%;
+        transition: right 0.3s ease;
+    }
+
+    .contactCardTopSection {
+        height: 35%;
+        border-radius: 30px 0px 0px 0px;
+    }
+
+    .addContactLogo {
+        display: flex;
+    }
+
+    .addAndEditContactHeadline {
+        font-size: 48px;
+        line-height: 58px;
+    }
+
+    .addContactSubheadline {
+        font-size: 27px;
+        line-height: 32px;
+    }
+
+    .avatarIcon {
+        top: calc(50% - 80px);
+    }
+
+    .contactCardBottomSection {
+        padding-top: 40px;
+        height: 65%;
+    }
+
+    .addEditInputForm {
+        justify-content: center;
+        height: 40%;
+        padding-left: 80px;
+        padding-right: 80px;
+        gap: 24px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding-top: 24px;
+        height: 100%;
+    }
+
+    .addContactContactDetails {
+        justify-content: center;
+        height: 36%;
+        padding-left: 0px;
+        padding-right: 0px;
+        gap: 24px;
+    }
+
+    .addEditContactButtons {
+        gap: 25px;
+    }
+
+    .createContactButton {
+        height: 60px;
+        width: 204px;
+        padding: 16px 10px 16px 10px;
+        filter: none;
+    }
+
+    .createContactButton:hover {
+        background-color: rgba(0, 93, 255, 1);
+    }
+
+    .createContactButton p {
+        font-size: 23px;
+    }
+
+    .cancelCreateContactButton {
+        display: flex;
+    }
+
+    .saveEditContactButton {
+        height: 60px;
+        width: 174px;
+        padding: 16px 10px 16px 10px;
+        gap: 4px;
+        filter: none;
+    }
+
+    .saveEditContactButton p {
+        font-size: 23px;
+    }
+
+    .saveEditContactButton:hover {
+        cursor: pointer;
+        background-color: rgba(0, 93, 255, 1);
+        filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .deleteEditContactButton {
+        height: 60px;
+        width: 106px;
+        padding: 16px 18px 16px 18px;
+        border-radius: 8px;
+        border: 1px solid rgba(100, 113, 136, 1);
+        transition: transform 0.1s ease-in-out;
+    }
+
+    .deleteEditContactButton p {
+        font-size: 23px;
+        color: rgba(100, 113, 136, 1);
+    }
+
+    .deleteEditContactButton:hover {
+        cursor: pointer;
+        border: 2px solid var(--maincolor);
+        filter: drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .contactCreatedButtonContainer {
+        padding-top: 0;
+        transition: bottom 0.450s ease;
+    }
+
+    .contactCreatedButton p {
+        font-size: 23px;
+        line-height: 28px;
+    }
+}

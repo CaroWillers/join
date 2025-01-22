@@ -1,0 +1,476 @@
+/*  Summary ----------------------------------------------------- */
+
+.summary-overview {
+    position: relative;
+    height: calc(100vh - 10rem);
+    width: 100vw;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 16px;
+    overflow-y: scroll;
+    bottom: -100%;
+    transition: 0.5s ease-in;
+    animation: slideup 0.6s forwards;
+    -webkit-animation: slideup 0.6s forwards;
+    opacity: 0;
+}
+
+@-webkit-keyframes slideup {
+    100% {
+        bottom: 0;
+    }
+}
+
+@keyframes slideup {
+    0% {
+        bottom: -100%;
+        opacity: 0;
+    }
+
+    100% {
+        bottom: 0;
+        opacity: 1;
+    }
+}
+
+.greeting-Container {
+    display: none;
+}
+
+.greeting {
+    display: none;
+}
+
+.btn-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 150px 106px 150px 150px;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    grid-template-areas:
+        " first first"
+        " second second"
+        "thrid fourth"
+        "fith sixed";
+    padding: 16px;
+    max-width: 400px;
+}
+
+.board {
+    grid-area: thrid;
+}
+
+.progress {
+    grid-area: fourth;
+}
+
+.feedback {
+    grid-area: fith;
+}
+
+.done {
+    grid-area: sixed;
+}
+
+.btn-container img {
+    height: 76px;
+    width: 76px;
+}
+
+.urgent-button {
+    background-color: var(--maincolor);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    border-radius: 30px;
+    padding: 40px 35px;
+    font-size: 16px;
+    border: 0px;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.16);
+    width: 100vw;
+    max-width: 400px;
+    grid-area: first;
+    max-height: 150px;
+    transition: all 0.15s ease-in-out;
+}
+
+.missed-deadline {
+    background-color: rgb(255, 61, 0) !important;
+}
+
+.urgent-button h2 {
+    font-weight: 700px;
+}
+
+.urgent-button p {
+    font-weight: 400;
+}
+
+.urgent-button:hover {
+    cursor: pointer;
+    border-radius: 0px 30px 30px 30px;
+    transform: scale(1.04);
+    background-color: white;
+    color: var(--hoverBlue);
+}
+
+.urgent-button:hover>.missed-deadline {
+    background-color: white !important;
+    color: red !important;
+}
+
+.urgent-button:hover .wiht-line {
+    border: 2px solid var(--hoverBlue);
+    transition-timing-function: ease-in-out;
+}
+
+.urgent-button:hover p {
+    font-size: 28px;
+    transition-timing-function: ease-in-out;
+}
+
+.urgent-button:hover h2 {
+    font-size: 43px;
+    transition-timing-function: ease-in-out;
+}
+
+.task-number {
+    font-weight: 700;
+    font-size: 48px;
+}
+
+.wiht-line {
+    height: 120px;
+    border: 2px solid white;
+    border-radius: 10px;
+}
+
+.btn-urgent-front {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 116px;
+}
+
+.btn-urgent-front p {
+    color: white;
+}
+
+.urgent-button:hover>.btn-urgent-front p {
+    color: var(--maincolor);
+}
+
+.btn-text {
+    font-size: 19px;
+    font-weight: 400;
+    color: var(--maincolor);
+}
+
+.btn-urgent-back {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    padding: 16px;
+    border-radius: 10px;
+    max-height: 140px;
+}
+
+.btn-urgent-back h2 {
+    font-size: 23px;
+}
+
+.btn-urgent-back p {
+    font-size: 16px;
+    font-weight: 300;
+}
+
+.to-do-btn {
+    background-color: var(--lightBlue);
+    width: 100vw;
+    max-width: 400px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 16px;
+    padding: 15px 40px;
+    border-radius: 30px;
+    border: 0px;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.16);
+    max-height: 106px;
+    grid-area: second;
+    transition: all 0.2s ease-in-out;
+
+}
+
+.to-do-btn:hover {
+    cursor: pointer;
+    border-radius: 0px 30px 30px 30px;
+    transform: scale(1.04);
+    background-color: white;
+    color: var(--hoverBlue);
+}
+
+.to-do-btn:hover .btn-text {
+    font-size: 28px;
+    font-weight: 400;
+}
+
+.to-do-btn-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.light-task-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 30px;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.16);
+    border: 0px;
+    padding: 15px 40px;
+    gap: 7px;
+    max-height: 160px;
+    max-width: 188px;
+    width: 50vw;
+    transition: all 0.2s ease-in-out;
+}
+
+.light-task-btn:hover {
+    cursor: pointer;
+    border-radius: 0px 30px 30px 30px;
+    transform: scale(1.04);
+    background-color: var(--hoverBlue);
+    color: white;
+
+}
+
+.light-task-btn:hover img {
+    height: 76px;
+    width: 76px;
+    overflow: hidden;
+    margin: -9px;
+}
+
+.light-task-btn:hover .summary-boarder-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 67px;
+    width: 67px;
+    border: 3px solid white;
+    border-radius: 100%;
+}
+
+.light-task-btn:hover .btn-text {
+    font-size: 28px;
+    font-weight: 400;
+    color: white;
+}
+
+.light-task-btn p {
+    color: var(--maincolor);
+}
+
+.gap-btn-light {
+    gap: 20px;
+}
+
+.flex-row-btn {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-fix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+}
+
+
+
+@media (max-width: 400px) {
+    .btn-container {
+        max-width: 300px;
+    }
+
+    .urgent-button {
+        width: 300px;
+    }
+
+    .light-task-btn {
+        width: 130px;
+    }
+
+    .to-do-btn {
+        width: 300px;
+    }
+
+    .summary-overview {
+        padding: 0;
+    }
+}
+
+@media (max-height: 850px) {
+    .summary-overview {
+        padding: 5px;
+        align-items: flex-start;
+    }
+
+    .btn-container {
+        padding: 0;
+    }
+}
+
+@media (min-height: 850px) {
+    .summary-overview {
+        align-items: center;
+    }
+}
+
+@media (min-width: 800px) {
+
+    .greeting-Container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 22px;
+    }
+
+    .greeting-user {
+        display: flex;
+        color: var(--greeting-text);
+        font-weight: 400;
+        font-size: 48px;
+    }
+
+    .greeting {
+        display: flex;
+        color: var(--greeting-text);
+        font-weight: 700;
+        font-size: 64px;
+    }
+
+    .summary-overview {
+        height: calc(100vh - 5rem);
+        width: calc(100vw - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px;
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    .to-do-btn {
+        background-color: var(--lightBlue);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+        padding: 40px;
+        max-width: 188px;
+        flex-direction: column;
+        max-height: 219px;
+        height: 209px;
+    }
+
+    .to-do-btn-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .light-task-btn {
+        padding: 40px;
+    }
+
+    .light-task-btn {
+        max-height: none;
+    }
+
+    .btn-container {
+        width: 100%;
+        min-width: 500px;
+        max-width: calc(100vw - 200px);
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 190px 220px 220px;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        grid-template-areas:
+            "first first first"
+            "second thrid fourth"
+            "fith sixed ."
+        ;
+    }
+
+    .urgent-button {
+        padding: 40px 35px;
+        max-width: 685px;
+        grid-area: first;
+        max-height: 188px;
+        width: 100%;
+        justify-content: space-evenly;
+    }
+
+}
+
+@media (min-width: 900px) {
+    .btn-container {
+        width: 650px;
+        gap: 24px;
+    }
+}
+
+@media (min-width: 1050px) {
+    .btn-container {
+        width: 100%;
+        max-width: 870px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: 190px 220px;
+        justify-content: center;
+        align-items: center;
+        gap: 24px;
+        grid-template-areas:
+            "first first first thrid"
+            "second fourth fith sixed"
+        ;
+    }
+
+    .board {
+        height: 190px;
+        max-height: 190px !important;
+    }
+
+    .urgent-button {
+        max-height: 190px;
+        gap: 32px;
+        justify-content: space-evenly;
+    }
+}
+
+@media (min-width: 1300px) {
+    .greeting-Container {
+        flex-direction: row;
+    }
+}

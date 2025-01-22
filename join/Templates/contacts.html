@@ -1,0 +1,66 @@
+<div class="contactsWrapper">
+    <div class="contactsContainer">
+        <div class="contactList" id="contactList">
+        </div>
+        <div class="addContactButtonContainer" id="addContactButtonContainer">
+            <button class="addContactButton" onclick="showAddContactCard()">
+                <p>Add new contact</p>
+                <img src="./img/addContactButtonIcon.svg">
+            </button>
+        </div>
+        <div class="editContactMenuContainer" id="editContactMenuContainer" onclick="hideContactEditDeleteMenu()">
+        </div>
+    </div>
+    <div class="contactDetailsContainer" id="contactInfo">
+        <div class="contactInfoBox">
+            <div class="contactInfoHeadlineAndBackButton">
+                <div class="contactInfoHeadlineMobile">
+                    Contact Information
+                </div>
+                <div class="contactInfoBackButton" onclick="closeContactInfo()">
+                    <img src="./img/contactInfoBackButton.svg">
+                </div>
+            </div>
+            <div class="contactInfoContactDetails" id="contactInfoContactDetails">
+            </div>
+        </div>
+        <div class="addContactButtonContainer" id="editContactButtonContainer">
+        </div>
+    </div>
+    <div id="addEditContact" class="addEditContactContainer" onclick="hideAddContactCard()">
+        <div class="addEditContactCard" id="addEditContactCard">
+            <div class="contactCardTopSection">
+                <div class="closeAddEditContactCard" onclick="hideAddContactCard()">
+                    <img src="./img/addEditContactCard.svg">
+                </div>
+                <div class="addContactLogo"><img src="./img/logo white.svg"></div>
+                <div class="addAndEditContactHeadline" id="addAndEditContactHeadline">Add contact</div>
+                <div class="addContactSubheadline" id="addContactSubheadline">Tasks are better with a team!</div>
+            </div>
+            <div class="avatarIcon" id="avatarIcon">
+                <img src="./img/addContactAvatar.svg">
+            </div>
+            <div class="contactCardBottomSection">
+                <form class="addEditInputForm" onsubmit="createContact();return false;">
+                    <div class="addContactContactDetails">
+                        <input required class="addContactDetailsInput addContactDetailsNameInput" type="text"
+                            placeholder="Name" id="editContactName" name="name">
+                        <input required pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" title="Beispiel: email@example.com"
+                            class="addContactDetailsInput addContactDetailsEmailInput" type="email" placeholder="Email"
+                            id="editContactEmail">
+                        <input required pattern="\+[0-9]{2}\s?[0-9]{3,}" title="Beispiel: +49 123456789 und mindestens 4 Ziffern"
+                            class="addContactDetailsInput addContactDetailsPhoneInput" type="tel" placeholder="Phone"
+                            id="editContactPhone">
+                    </div>
+                    <div class="addEditContactButtons" id="addEditContactButtons">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="contactCreatedButtonContainer" id="contactCreatedButtonContainer">
+        <div class="contactCreatedButton">
+            <p>Contact successfully created</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: signup.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: signup.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Validates the user's email address.
+ * @returns {boolean} Returns true if the email address is valid, otherwise false.
+ */
+function validateEmailAddress() {
+    let emailInput = document.getElementById("email");
+    let email = emailInput.value;
+    let pattern = new RegExp('[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}');
+    let emailMessage = document.getElementById("msgBoxValidateEmail");  
+
+    if (!pattern.test(email)) {
+        emailMessage.innerHTML = "Bitte geben Sie eine gültige E-Mail-Adresse ein.";
+        emailMessage.style.color = "red";
+        return false;
+    } else {
+        emailMessage.innerHTML = "E-Mail-Adresse ist gültig.";
+        emailMessage.style.color = "green";
+        return true;
+    }
+}
+
+/**
+ * Checks the strength of the password entered by the user.
+ * @returns {boolean} Returns true if the password meets the strength criteria, otherwise rturns false.
+ */
+function checkPasswordStrength() {
+    let password = document.getElementById("password").value;
+    let strengthIndicator = document.getElementById("passwordStrengthMessage");
+
+    let pattern = new RegExp('(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}');
+
+    if (!pattern.test(password)) {
+        strengthIndicator.innerHTML = "Password must be at least 8 characters, including one uppercase letter, one lowercase letter, and one number";
+        strengthIndicator.style.color = "red";
+        return false;
+    } else {
+        strengthIndicator.innerHTML = "Your password strength is ok";
+        strengthIndicator.style.color = "green";
+        return true;
+    }
+}
+
+/**
+ * Validates the input to confirm the password entered by the user.
+ * @returns {boolean} Returns true if the confirmed password matches the original password, otherwise returns false.
+ */
+function validateConfirmedPassword() {
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirm_password").value;
+    let message = document.getElementById("passwordMatchMessage");
+
+    if (password !== confirmPassword) {
+        message.textContent = "Your passwords do not match";
+        message.style.color = "red";
+        return false;
+    } else {
+        message.textContent = "Your password is confirmed";
+        message.style.color = "green";
+        return true;
+    }
+}
+
+/**
+ * Toggles the visibility of the password input field and changes the visibility icon accordingly.
+ * @param {string} fieldId - The ID of the password input field.
+ */
+function togglePassword(fieldId) {
+    let input = document.getElementById(fieldId);
+    let iconId = (fieldId === "password") ? "passwordIcon" : (fieldId === "newPassword") ? "newPasswordIcon" : "confirmPasswordIcon";
+    let icon = document.getElementById(iconId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.src = "./img/visibility_off.svg";
+    } else {
+        input.type = "password";
+        icon.src = "./img/visibility.svg";
+    }
+}
+
+/**
+ * Changes the visibility icon of the password input field.
+ * @param {HTMLElement} inputElement - The password input field element.
+ */
+function changeLockIcon(inputElement) {
+    inputElement.nextElementSibling.src = "./img/visibility_off.svg";
+}
+
+/**
+ * Checks if the Privacy Policy checkbox is checked before final signup is possible.
+ * If the checkbox is not checked, displays an alert message prompting the user to accept the Privacy Policy.
+ * @returns {boolean} Returns true if the Privacy Policy checkbox is checked, otherwise false.
+ */
+function togglePrivacyPolicyCheckbox(buttonElement) {
+    let container = buttonElement.closest('.checkboxContainerSignup');
+    let realCheckbox = container.querySelector(".realCheckbox");
+    let checkboxImage = container.querySelector(".checkboxImage");
+
+    realCheckbox.checked = !realCheckbox.checked;
+    checkboxImage.src = realCheckbox.checked ? checkboxImage.getAttribute('data-checked') : checkboxImage.getAttribute('data-unchecked');
+}
+
+/**
+ * Checks if the Privacy Policy checkbox is checked before final signup is possible
+ * If the checkbox is not checked, displays an alert message prompting the user to accept the Privacy Policy.
+ * @returns {boolean} Returns true if the Privacy Policy checkbox is checked, otherwise returns false.
+ */
+function checkPrivacyPolicy() {
+    let realCheckbox = document.querySelector(".realCheckbox");
+    if (!realCheckbox.checked) {
+        alert("Please accept the Privacy Policy conditions");
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Asynchronously loads user data from storage.
+ * @returns {Promise&lt;Array>} A promise that resolves to an array of users if found, otherwise returns an empty array.
+ * @throws {Error} Throws an error if there is an issue loading the users.
+ */
+async function loadUsers() {
+    try {
+        let result = await getItem('users');
+        if (result) {
+            let users = JSON.parse(result);
+            return users;
+        } else {
+            console.log("No users found in storage, returning empty array.");
+            return [];
+        }
+    } catch (e) {
+        console.error('Loading error:', e);
+        return [];
+    }
+}
+
+function loadGuestUser() {
+    let guestData = localStorage.getItem('guestUser');
+    if (guestData) {
+        return JSON.parse(guestData);
+    } else {
+        console.error('No guest user data found in local storage.');
+        return null;
+    }
+}
+
+/**
+ * Adds a new user after form validation and redirects to login page on success.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function addUser() {
+    let email = document.getElementById('email').value;
+    let password = document.getElementById('password').value;
+    let name = document.getElementById('name').value;
+
+    if (!validateFormFields(email, password, name)) {
+        return;
+    }
+
+    if (!checkPrivacyPolicy()) {
+        return;
+    }
+
+    if (await checkIfEmailExists(email)) {
+        alert("This email is already registered.");
+        return;
+    }
+
+    const user = {
+        name: name,
+        email: email,
+        password: password,
+        userContacts: contacts
+    };
+
+    await saveNewUser(user);
+    successfulSignup(); 
+}
+
+/**
+ * Displays the login modal.
+ */
+function successfulSignup() {
+    let signupModal = document.getElementById("signupModal");
+    if (signupModal.style.display !== "block") {
+        signupModal.style.display = "block";
+
+        setTimeout(function() {
+            if (signupModal.style.display === "block") {
+                signupModal.style.display = "none";
+                window.location.href = '../login.html';
+            }
+        }, 2000);
+    }
+}
+
+/**
+ * Validates form fields and displays an alert if any field is empty.
+ * @param {string} email - User's email address.
+ * @param {string} password - User's password.
+ * @param {string} name - User's name.
+ * @returns {boolean} - Returns true if all fields are filled, otherwise false.
+ */
+function validateFormFields(email, password, name) {
+    if (email === "" || password === "" || name === "") {
+        alert("Please fill in all fields");
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Saves a new user to the storage.
+ * @param {Object} user - The user object to be saved.
+ * @async
+ * @returns {Promise&lt;void>}
+ */
+async function saveNewUser(user) {
+    let users = await loadUsers();
+    users.push(user);
+    await setItem('users', JSON.stringify(users));
+}
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#CreatedPopUpOptions">CreatedPopUpOptions</a></li><li><a href="global.html#EditTemplate">EditTemplate</a></li><li><a href="global.html#NoMatchFound">NoMatchFound</a></li><li><a href="global.html#SubtaskStatus">SubtaskStatus</a></li><li><a href="global.html#TaskCadBigTemplate">TaskCadBigTemplate</a></li><li><a href="global.html#TaskTextInEdit">TaskTextInEdit</a></li><li><a href="global.html#TemplateGreetMobile">TemplateGreetMobile</a></li><li><a href="global.html#TemplateSubtaskProgressbar">TemplateSubtaskProgressbar</a></li><li><a href="global.html#Templates">Templates</a></li><li><a href="global.html#UpdateTaskInRemote">UpdateTaskInRemote</a></li><li><a href="global.html#UserInitals">UserInitals</a></li><li><a href="global.html#addContactButtonsCancelAndCreateButtonsHTMLTemplate">addContactButtonsCancelAndCreateButtonsHTMLTemplate</a></li><li><a href="global.html#addTaskInit">addTaskInit</a></li><li><a href="global.html#addTaskToBoard">addTaskToBoard</a></li><li><a href="global.html#addUser">addUser</a></li><li><a href="global.html#allowDrop">allowDrop</a></li><li><a href="global.html#assignedInitals">assignedInitals</a></li><li><a href="global.html#assingContact">assingContact</a></li><li><a href="global.html#bigCard">bigCard</a></li><li><a href="global.html#bigCardAssigned">bigCardAssigned</a></li><li><a href="global.html#bigCardAssignedTemplate">bigCardAssignedTemplate</a></li><li><a href="global.html#bigCardSubtaskTemplate">bigCardSubtaskTemplate</a></li><li><a href="global.html#bigCardSubtasks">bigCardSubtasks</a></li><li><a href="global.html#bigCardSubtasksCheck">bigCardSubtasksCheck</a></li><li><a href="global.html#boardPlace">boardPlace</a></li><li><a href="global.html#boardPopupAddTask">boardPopupAddTask</a></li><li><a href="global.html#boardPopupAddTaskWindow">boardPopupAddTaskWindow</a></li><li><a href="global.html#boardTaskNumber">boardTaskNumber</a></li><li><a href="global.html#buildTemplateForArrayInput">buildTemplateForArrayInput</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#cardTemplate">cardTemplate</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#changeBackCheckBoxStyle">changeBackCheckBoxStyle</a></li><li><a href="global.html#changeCheckBoxStyle">changeCheckBoxStyle</a></li><li><a href="global.html#changeContactButtonColorAsClicked">changeContactButtonColorAsClicked</a></li><li><a href="global.html#changeContactButtonEmailColorToWhite">changeContactButtonEmailColorToWhite</a></li><li><a href="global.html#changeLockIcon">changeLockIcon</a></li><li><a href="global.html#changeNavigation">changeNavigation</a></li><li><a href="global.html#changeNavigationAddTask">changeNavigationAddTask</a></li><li><a href="global.html#changeNavigationHighlightSummary">changeNavigationHighlightSummary</a></li><li><a href="global.html#changeNavigationPrivacyPolicy">changeNavigationPrivacyPolicy</a></li><li><a href="global.html#changePriorityColor">changePriorityColor</a></li><li><a href="global.html#checkAssignContact">checkAssignContact</a></li><li><a href="global.html#checkCards">checkCards</a></li><li><a href="global.html#checkErrors">checkErrors</a></li><li><a href="global.html#checkForDuplicateEmail">checkForDuplicateEmail</a></li><li><a href="global.html#checkIfEmailExists">checkIfEmailExists</a></li><li><a href="global.html#checkIfUserIsAddedAsContact">checkIfUserIsAddedAsContact</a></li><li><a href="global.html#checkInputValue">checkInputValue</a></li><li><a href="global.html#checkPasswordStrength">checkPasswordStrength</a></li><li><a href="global.html#checkPrivacyPolicy">checkPrivacyPolicy</a></li><li><a href="global.html#clearAddContactForm">clearAddContactForm</a></li><li><a href="global.html#clearPasswordError">clearPasswordError</a></li><li><a href="global.html#clearSubtaskInputField">clearSubtaskInputField</a></li><li><a href="global.html#clickedButtonEmailColors">clickedButtonEmailColors</a></li><li><a href="global.html#clickedButtons">clickedButtons</a></li><li><a href="global.html#clickedLegalPart">clickedLegalPart</a></li><li><a href="global.html#closeAssignToDropdown">closeAssignToDropdown</a></li><li><a href="global.html#closeCard">closeCard</a></li><li><a href="global.html#closeContactInfo">closeContactInfo</a></li><li><a href="global.html#closeDropdowenTask">closeDropdowenTask</a></li><li><a href="global.html#closeDropdown">closeDropdown</a></li><li><a href="global.html#closeTaskCategoryDropdown">closeTaskCategoryDropdown</a></li><li><a href="global.html#createCardObject">createCardObject</a></li><li><a href="global.html#createCategories">createCategories</a></li><li><a href="global.html#createContact">createContact</a></li><li><a href="global.html#createNewContactDataSet">createNewContactDataSet</a></li><li><a href="global.html#createTask">createTask</a></li><li><a href="global.html#createUserAsContact">createUserAsContact</a></li><li><a href="global.html#currentDraggedElement">currentDraggedElement</a></li><li><a href="global.html#deleteContact">deleteContact</a></li><li><a href="global.html#deleteCreatedSubtask">deleteCreatedSubtask</a></li><li><a href="global.html#deleteTask">deleteTask</a></li><li><a href="global.html#deleteUneditTask">deleteUneditTask</a></li><li><a href="global.html#displayClosestDueDate">displayClosestDueDate</a></li><li><a href="global.html#doNotClose">doNotClose</a></li><li><a href="global.html#doneCardUpdate">doneCardUpdate</a></li><li><a href="global.html#doneNumber">doneNumber</a></li><li><a href="global.html#drop">drop</a></li><li><a href="global.html#dropMobile">dropMobile</a></li><li><a href="global.html#dropdowenTask">dropdowenTask</a></li><li><a href="global.html#dropdownHelp">dropdownHelp</a></li><li><a href="global.html#dropdownLegalNotice">dropdownLegalNotice</a></li><li><a href="global.html#dropdownPrivacyPolicy">dropdownPrivacyPolicy</a></li><li><a href="global.html#editContactDeleteAndSaveButtonLayoutHTMLTemplate">editContactDeleteAndSaveButtonLayoutHTMLTemplate</a></li><li><a href="global.html#editCreatedSubtask">editCreatedSubtask</a></li><li><a href="global.html#editTask">editTask</a></li><li><a href="global.html#editTaskDone">editTaskDone</a></li><li><a href="global.html#emptyArrays">emptyArrays</a></li><li><a href="global.html#errorMessageIfEmptyCategory">errorMessageIfEmptyCategory</a></li><li><a href="global.html#errorMessageIfEmptyDueDate">errorMessageIfEmptyDueDate</a></li><li><a href="global.html#errorMessageIfEmptyTitle">errorMessageIfEmptyTitle</a></li><li><a href="global.html#feedbackCardUpdate">feedbackCardUpdate</a></li><li><a href="global.html#feedbackNumber">feedbackNumber</a></li><li><a href="global.html#formatContactName">formatContactName</a></li><li><a href="global.html#formatDueDate">formatDueDate</a></li><li><a href="global.html#getCategoryColor">getCategoryColor</a></li><li><a href="global.html#getContactData">getContactData</a></li><li><a href="global.html#getContactRelatedInfo">getContactRelatedInfo</a></li><li><a href="global.html#getIndexByNameSurname">getIndexByNameSurname</a></li><li><a href="global.html#getOldestOverdueDate">getOldestOverdueDate</a></li><li><a href="global.html#getPriorityImagePath">getPriorityImagePath</a></li><li><a href="global.html#getQueryParam">getQueryParam</a></li><li><a href="global.html#getSelectedContact">getSelectedContact</a></li><li><a href="global.html#getTaskData">getTaskData</a></li><li><a href="global.html#giveId">giveId</a></li><li><a href="global.html#goBack">goBack</a></li><li><a href="global.html#greetUser">greetUser</a></li><li><a href="global.html#greetUserMobile">greetUserMobile</a></li><li><a href="global.html#guestLogin">guestLogin</a></li><li><a href="global.html#handleContactAssignment">handleContactAssignment</a></li><li><a href="global.html#handleRememberMeChange">handleRememberMeChange</a></li><li><a href="global.html#hideAddContactCard">hideAddContactCard</a></li><li><a href="global.html#hideContactEditDeleteMenu">hideContactEditDeleteMenu</a></li><li><a href="global.html#highlightCreatedContact">highlightCreatedContact</a></li><li><a href="global.html#highlightErrorMessage">highlightErrorMessage</a></li><li><a href="global.html#includeAddTask">includeAddTask</a></li><li><a href="global.html#includeHTML">includeHTML</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initContacts">initContacts</a></li><li><a href="global.html#insertAnimation">insertAnimation</a></li><li><a href="global.html#isAssignedEdit">isAssignedEdit</a></li><li><a href="global.html#legalNoticeHiglite">legalNoticeHiglite</a></li><li><a href="global.html#loadAddTasks">loadAddTasks</a></li><li><a href="global.html#loadBoard">loadBoard</a></li><li><a href="global.html#loadContacts">loadContacts</a></li><li><a href="global.html#loadRememberedPassword">loadRememberedPassword</a></li><li><a href="global.html#loadRemoteContactsOfLoggedInUser">loadRemoteContactsOfLoggedInUser</a></li><li><a href="global.html#loadTasks">loadTasks</a></li><li><a href="global.html#loadUsers">loadUsers</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#lowPriorityButtonStylingWhenClicked">lowPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#matchingCategoryCheck">matchingCategoryCheck</a></li><li><a href="global.html#mediumPriorityButtonStylingWhenClicked">mediumPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#mobileGreeting">mobileGreeting</a></li><li><a href="global.html#navigateTo">navigateTo</a></li><li><a href="global.html#navigationClick">navigationClick</a></li><li><a href="global.html#navigationClickImg">navigationClickImg</a></li><li><a href="global.html#newContactDataSetForArray">newContactDataSetForArray</a></li><li><a href="global.html#openAssignToDropdown">openAssignToDropdown</a></li><li><a href="global.html#openContactInfo">openContactInfo</a></li><li><a href="global.html#openContactInfoHTMLTemplate">openContactInfoHTMLTemplate</a></li><li><a href="global.html#openCreatedSubtaskBox">openCreatedSubtaskBox</a></li><li><a href="global.html#openDropdown">openDropdown</a></li><li><a href="global.html#openTaskCategoryDropdown">openTaskCategoryDropdown</a></li><li><a href="global.html#outputDeadlineText">outputDeadlineText</a></li><li><a href="global.html#outputDueDate">outputDueDate</a></li><li><a href="global.html#priorityEdit">priorityEdit</a></li><li><a href="global.html#priorityImgCheck">priorityImgCheck</a></li><li><a href="global.html#privacyPolicyHighlight">privacyPolicyHighlight</a></li><li><a href="global.html#progressCardUpdate">progressCardUpdate</a></li><li><a href="global.html#progressNumber">progressNumber</a></li><li><a href="global.html#progressbarCompetedRate">progressbarCompetedRate</a></li><li><a href="global.html#redesignAddContactCardToEditContactCard">redesignAddContactCardToEditContactCard</a></li><li><a href="global.html#rememberPassword">rememberPassword</a></li><li><a href="global.html#removeClickedLegalPart">removeClickedLegalPart</a></li><li><a href="global.html#removeNavHighlightLegalPartOnDropdown">removeNavHighlightLegalPartOnDropdown</a></li><li><a href="global.html#removeNavHighlightOnDropdown">removeNavHighlightOnDropdown</a></li><li><a href="global.html#removeNavigationClick">removeNavigationClick</a></li><li><a href="global.html#renderAddContactLayout">renderAddContactLayout</a></li><li><a href="global.html#renderAllContacts">renderAllContacts</a></li><li><a href="global.html#renderContactCategory">renderContactCategory</a></li><li><a href="global.html#renderContactCategoryAndEachContact">renderContactCategoryAndEachContact</a></li><li><a href="global.html#renderContactList">renderContactList</a></li><li><a href="global.html#renderEachContact">renderEachContact</a></li><li><a href="global.html#renderFilteredContacts">renderFilteredContacts</a></li><li><a href="global.html#resetAddTaskForm">resetAddTaskForm</a></li><li><a href="global.html#resetContactButtonColor">resetContactButtonColor</a></li><li><a href="global.html#resetContactButtonEmailColor">resetContactButtonEmailColor</a></li><li><a href="global.html#resetCreateTaskFormInputs">resetCreateTaskFormInputs</a></li><li><a href="global.html#resetLastClickedContactButtonColor">resetLastClickedContactButtonColor</a></li><li><a href="global.html#resetLastClickedContactButtonEmailColor">resetLastClickedContactButtonEmailColor</a></li><li><a href="global.html#resetNavigationItems">resetNavigationItems</a></li><li><a href="global.html#resetOtherPriorityButtonStyles">resetOtherPriorityButtonStyles</a></li><li><a href="global.html#saveEditSubtaskInput">saveEditSubtaskInput</a></li><li><a href="global.html#saveNewUser">saveNewUser</a></li><li><a href="global.html#saveSubtaskInput">saveSubtaskInput</a></li><li><a href="global.html#scrollDown">scrollDown</a></li><li><a href="global.html#scrollToAnchor">scrollToAnchor</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchContactToAssign">searchContactToAssign</a></li><li><a href="global.html#selectTaskCategory">selectTaskCategory</a></li><li><a href="global.html#separateCards">separateCards</a></li><li><a href="global.html#setButtonColorAsClicked">setButtonColorAsClicked</a></li><li><a href="global.html#setEmailColorAsClicked">setEmailColorAsClicked</a></li><li><a href="global.html#setGuestLogin">setGuestLogin</a></li><li><a href="global.html#setUserLogin">setUserLogin</a></li><li><a href="global.html#showAddContactCard">showAddContactCard</a></li><li><a href="global.html#showAvatarsOfSelectedContacts">showAvatarsOfSelectedContacts</a></li><li><a href="global.html#showContactCreatedPopUp">showContactCreatedPopUp</a></li><li><a href="global.html#showContactEditDeleteMenu">showContactEditDeleteMenu</a></li><li><a href="global.html#showCurrentContactDetails">showCurrentContactDetails</a></li><li><a href="global.html#showEditAndDeleteMenuOnMobile">showEditAndDeleteMenuOnMobile</a></li><li><a href="global.html#showEditContact">showEditContact</a></li><li><a href="global.html#showTaskCreatedPopUp">showTaskCreatedPopUp</a></li><li><a href="global.html#showTaskCreatedPopUpBoard">showTaskCreatedPopUpBoard</a></li><li><a href="global.html#sortByFirstName">sortByFirstName</a></li><li><a href="global.html#sortUpcomingCards">sortUpcomingCards</a></li><li><a href="global.html#startAnimation">startAnimation</a></li><li><a href="global.html#startDragging">startDragging</a></li><li><a href="global.html#subtaskCompleted">subtaskCompleted</a></li><li><a href="global.html#subtaskEdit">subtaskEdit</a></li><li><a href="global.html#subtaskNotCompleted">subtaskNotCompleted</a></li><li><a href="global.html#successfulLogin">successfulLogin</a></li><li><a href="global.html#successfulSignup">successfulSignup</a></li><li><a href="global.html#summaryLoad">summaryLoad</a></li><li><a href="global.html#summaryLoadNumbers">summaryLoadNumbers</a></li><li><a href="global.html#templateOkBtn">templateOkBtn</a></li><li><a href="global.html#todoCardUpdate">todoCardUpdate</a></li><li><a href="global.html#todoNumber">todoNumber</a></li><li><a href="global.html#toggleAssignToDropdown">toggleAssignToDropdown</a></li><li><a href="global.html#toggleCheckbox">toggleCheckbox</a></li><li><a href="global.html#toggleContactButtonColor">toggleContactButtonColor</a></li><li><a href="global.html#toggleContactButtonEmailColor">toggleContactButtonEmailColor</a></li><li><a href="global.html#toggleIndex">toggleIndex</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePrivacyPolicyCheckbox">togglePrivacyPolicyCheckbox</a></li><li><a href="global.html#toggleRememberMeCheckbox">toggleRememberMeCheckbox</a></li><li><a href="global.html#toggleSelectTaskCategoryDropdown">toggleSelectTaskCategoryDropdown</a></li><li><a href="global.html#uncheckAssignContact">uncheckAssignContact</a></li><li><a href="global.html#unclickCreatedContact">unclickCreatedContact</a></li><li><a href="global.html#updateCards">updateCards</a></li><li><a href="global.html#updateContact">updateContact</a></li><li><a href="global.html#updateDueDateContainers">updateDueDateContainers</a></li><li><a href="global.html#updateUserContactsInRemote">updateUserContactsInRemote</a></li><li><a href="global.html#updateUserContactsInRemoteAfterRegistration">updateUserContactsInRemoteAfterRegistration</a></li><li><a href="global.html#urgentButtonColor">urgentButtonColor</a></li><li><a href="global.html#urgentNumber">urgentNumber</a></li><li><a href="global.html#urgentPriorityButtonStylingWhenClicked">urgentPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#validateConfirmedPassword">validateConfirmedPassword</a></li><li><a href="global.html#validateEmailAddress">validateEmailAddress</a></li><li><a href="global.html#validateFormFields">validateFormFields</a></li><li><a href="global.html#validateTaskData">validateTaskData</a></li><li><a href="global.html#wrongPasswordMessage">wrongPasswordMessage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue May 07 2024 10:05:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

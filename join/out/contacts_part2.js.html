@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: contacts_part2.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: contacts_part2.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * This function checks if a contact with the provided email already exists in the
+ * `localContacts` array.
+ *
+ * @param {string} email The email address to check for duplication.
+ * @returns {boolean} `true` if a duplicate email is found, `false` otherwise.
+ */
+function checkForDuplicateEmail(email, phone) {
+    for (let i = 0; i &lt; localContacts.length; i++) {
+        if (localContacts[i].email === email) {
+            alert('A contact with the same email address already exists in your list.');
+            return true;
+        } else if (localContacts[i].phone === phone) {
+            alert('A contact with the same phone number already exists in your list.');
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * This function finds the index of a contact in the `localContacts` array by name (first and last).
+ *
+ * @param {Array} localContacts The array of contact objects.
+ * @param {string} firstName The first name of the contact to find.
+ * @param {string} lastName The last name of the contact to find.
+ * @returns {number} The index of the contact in the array, or -1 if not found.
+ */
+function getIndexByNameSurname(localContacts, firstName, lastName) {
+    for (let i = 0; i &lt; localContacts.length; i++) {
+        if (localContacts[i].name === firstName &amp;&amp; localContacts[i].surname === lastName) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * This function opens the contact info card and populates it with the contact at the specified index.
+ *
+ * @param {number} index The index of the contact to open.
+ */
+function openContactInfo(index) {
+    if (window.innerWidth >= 800) {
+        highlightCreatedContact(index);
+    }
+    document.getElementById('contactInfo').classList.add('showContactDetailsContainer');
+    if (localContacts[index].name === 'Guest') {
+        openGuestContactInfoHTMLTemplate(index);
+    } else if (localContacts[index].name != 'Guest') {
+        openContactInfoHTMLTemplate(index);
+    }
+}
+
+/**
+ * This function visually highlights the newly created contact in the contact list.
+ *
+ * @param {number} index The index of the newly created contact.
+ */
+function highlightCreatedContact(index) {
+    document.getElementById(`contact(${index})`).classList.add('contactClicked');
+    document.getElementById(`contactEmail(${index})`).style.color = "white";
+    toggleIndex = index;
+}
+
+/**
+ * This function displays a temporary "Contact Created" pop-up notification.
+ */
+function showContactCreatedPopUp() {
+    document.getElementById('contactCreatedButtonContainer').classList.add('showContactCreatedButtonContainer');
+    setTimeout(() => {
+        document.getElementById('contactCreatedButtonContainer').classList.remove('showContactCreatedButtonContainer');
+    }, 800);
+}
+
+/**
+ * This function clears the input fields in the "Add Contact" form.
+ */
+function clearAddContactForm() {
+    document.getElementById("editContactName").value = "";
+    document.getElementById("editContactEmail").value = "";
+    document.getElementById("editContactPhone").value = "";
+}
+
+/**
+ * This function smooth-scrolls the webpage to the element with the specified anchor ID.
+ *
+ * @param {string} anchorId The ID of the anchor element to scroll to.
+ */
+function scrollToAnchor(anchorId) {
+    const anchorElement = document.getElementById(anchorId);
+    if (anchorElement) {
+        anchorElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    }
+}
+
+/**
+* This variable stores an array of IDs for buttons that have been clicked on the contact list.
+* Used to keep track of clicked contacts for styling purposes.
+* @type {string[]}
+*/
+let clickedButtons = [];
+
+/**
+ * This variable stores an array of IDs for email elements within clicked contacts.
+ * Used to keep track of clicked contact email colors for styling purposes.
+ * @type {string[]}
+ */
+let clickedButtonEmailColors = [];
+
+/**
+ * This function handles clicks on contact buttons in the contact list.
+ * It checks the screen size and performs different actions based on the width.
+ *   - For screens wider than 800px:
+ *     - Unclicks any previously clicked contact.
+     - Gets the ID of the clicked button and its DOM element.
+     - Toggles the clicked button's color and style.
+     - Changes the email color of the clicked contact to white.
+   - For screens smaller than 800px:
+     - Opens the contact info for the clicked contact.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function changeContactButtonColorAsClicked(index) {
+    if (window.innerWidth >= 800) {
+        unclickCreatedContact(toggleIndex);
+        const buttonId = `contact(${index})`;
+        const buttonElement = document.getElementById(buttonId);
+        toggleContactButtonColor(buttonId, buttonElement, index);
+        changeContactButtonEmailColorToWhite(index);
+    } else if (window.innerWidth &lt; 800) {
+        openContactInfo(index);
+    }
+}
+
+/**
+ * This function toggles the color and style of a clicked contact button.
+ * It checks if the button has already been clicked.
+ *   - If clicked:
+ *     - Resets the button's color and style to its original state.
+     - Closes the contact info.
+   - If not clicked:
+ *     - Sets the button's color and style to indicate it's clicked.
+     - Opens the contact info.
+     - Adds the button's ID to the `clickedButtons` array.
+     - Resets the color of the previously clicked contact button (if any).
+ * @param {string} buttonId - The ID of the clicked button.
+ * @param {HTMLElement} buttonElement - The DOM element of the clicked button.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function toggleContactButtonColor(buttonId, buttonElement, index) {
+    if (clickedButtons.includes(buttonId)) {
+        resetContactButtonColor(buttonElement, buttonId);
+        closeContactInfo();
+    } else {
+        setButtonColorAsClicked(buttonElement);
+        openContactInfo(index);
+        clickedButtons.push(buttonId);
+        resetLastClickedContactButtonColor();
+    }
+}
+
+/**
+ * This function resets the color and style of a clicked contact button to its original state.
+ * It also removes the button's ID from the `clickedButtons` array.
+ * @param {HTMLElement} buttonElement - The DOM element of the button to reset.
+ * @param {string} buttonId - The ID of the button to reset.
+ */
+function resetContactButtonColor(buttonElement, buttonId) {
+    buttonElement.classList.remove('contactClicked');
+    clickedButtons = clickedButtons.filter(id => id !== buttonId);
+}
+
+/**
+ * This function sets the color and style of a contact button to indicate it's clicked.
+ * @param {HTMLElement} buttonElement - The DOM element of the button to style.
+ */
+function setButtonColorAsClicked(buttonElement) {
+    buttonElement.classList.add('contactClicked');
+}
+
+/**
+ * This function resets the color of the previously clicked contact button (if any).
+ * It retrieves the ID of the last clicked button from the `clickedButtons` array and removes it from the DOM styles.
+ */
+function resetLastClickedContactButtonColor() {
+    const lastClickedButtonId = clickedButtons[clickedButtons.length - 2];
+    if (lastClickedButtonId) {
+        document.getElementById(lastClickedButtonId).classList.remove('contactClicked');
+        clickedButtons = clickedButtons.filter(id => id !== lastClickedButtonId);
+    }
+}
+
+/**
+ * This function closes the contact info panel by removing the corresponding class from the DOM element.
+ */
+function closeContactInfo() {
+    document.getElementById('contactInfo').classList.remove('showContactDetailsContainer');
+}
+
+/**
+ * This function changes the email color of a clicked contact to white (for screens wider than 800px).
+ * It retrieves the email element's ID and DOM element based on the clicked contact index.
+ * Then, it calls the `toggleContactButtonEmailColor` function to handle the color change logic.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function changeContactButtonEmailColorToWhite(index) {
+    if (window.innerWidth >= 800) {
+        const emailId = `contactEmail(${index})`;
+        const emailElement = document.getElementById(emailId);
+        toggleContactButtonEmailColor(emailId, emailElement, index);
+    }
+}
+
+/**
+ * This function toggles the color of the email element within a clicked contact button.
+ * It checks if the email element has already been clicked.
+ *   - If clicked:
+ *     - Resets the email element's color to its original state.
+   - If not clicked:
+ *     - Sets the email element's color to white.
+     - Adds the email element's ID to the `clickedButtonEmailColors` array.
+     - Resets the color of the previously clicked contact's email element (if any).
+ * @param {string} emailId - The ID of the email element within the clicked contact button.
+ * @param {HTMLElement} emailElement - The DOM element of the email element.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function toggleContactButtonEmailColor(emailId, emailElement, index) {
+    if (clickedButtonEmailColors.includes(emailId)) {
+        resetContactButtonEmailColor(emailElement, emailId);
+    } else {
+        setEmailColorAsClicked(emailElement);
+        clickedButtonEmailColors.push(emailId);
+        resetLastClickedContactButtonEmailColor();
+    }
+}
+
+/**
+ * This function resets the color of a clicked contact's email element to its original state.
+ * It also removes the email element's ID from the `clickedButtonEmailColors` array.
+ * @param {HTMLElement} emailElement - The DOM element of the email element to reset.
+ * @param {string} emailId - The ID of the email element to reset.
+ */
+function resetContactButtonEmailColor(emailElement, emailId) {
+    emailElement.style.color = "rgba(69, 137, 255, 1)";
+    clickedButtonEmailColors = clickedButtonEmailColors.filter(id => id !== emailId);
+}
+
+/**
+ * This function sets the color of a contact's email element to white.
+ * @param {HTMLElement} emailElement - The DOM element of the email element to style.
+ */
+function setEmailColorAsClicked(emailElement) {
+    emailElement.style.color = "white";
+}
+
+/**
+ * This function resets the color of the previously clicked contact's email element (if any).
+ * It retrieves the ID of the last clicked email element from the `clickedButtonEmailColors` array and removes it from the DOM styles.
+ */
+function resetLastClickedContactButtonEmailColor() {
+    const lastClickedEmailId = clickedButtonEmailColors[clickedButtonEmailColors.length - 2];
+    if (lastClickedEmailId) {
+        document.getElementById(lastClickedEmailId).style.color = "rgba(69, 137, 255, 1)";
+        clickedButtonEmailColors = clickedButtonEmailColors.filter(id => id !== lastClickedEmailId);
+    }
+}
+
+/**
+* This variable stores the index of the currently highlighted contact (for screens wider than 800px).
+* Used to keep track of which contact is visually selected.
+* @type {number}
+*/
+let toggleIndex = 0;
+
+/**
+ * This function removes the visual highlight from the previously highlighted contact (for screens wider than 800px).
+ * It uses the `toggleIndex` variable to identify the contact that was previously highlighted.
+ * It removes the "contactClicked" class from the button and resets the email color to its original state.
+ * @param {number} toggleIndex - The index of the previously highlighted contact (should be the same value stored in the `toggleIndex` variable).
+ * @returns {void}
+ */
+function unclickCreatedContact(toggleIndex) {
+    if (toggleIndex &lt; localContacts.length) {
+        document.getElementById(`contact(${toggleIndex})`).classList.remove('contactClicked');
+        document.getElementById(`contactEmail(${toggleIndex})`).style.color = "rgba(69, 137, 255, 1)";
+    } else toggleIndex--;
+}
+
+/**
+ * This function opens the edit contact card to modify the details of the clicked contact.
+ * It shows the card container, sets a timeout to add the "show" class with animation, and calls other functions to handle additional functionalities.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function showEditContact(index) {
+    document.getElementById('addEditContact').style.display = 'flex';
+    setTimeout(() => {
+        document.getElementById('addEditContactCard').classList.add('showAddEditContactContainer');
+    }, 25);
+    showEditAndDeleteMenuOnMobile();
+    redesignAddContactCardToEditContactCard();
+    showCurrentContactDetails(index);
+    editContactDeleteAndSaveButtonLayoutHTMLTemplate(index);
+    if (window.innerWidth &lt; 800) {
+        document.getElementById('editContactMenuContainer').style.display = 'flex';
+    }
+    document.getElementById('addEditContactCard').onclick = function (event) {
+        event.stopPropagation();
+    };
+}
+
+/**
+ * This function hides the edit and delete menu on mobile screens (less than 800px wide) when the edit contact card is opened.
+ */
+function showEditAndDeleteMenuOnMobile() {
+    if (window.innerWidth &lt; 800) {
+        document.getElementById('editContactMenuContainer').style.display = 'none';
+        hideContactEditDeleteMenu();
+    }
+}
+
+/**
+ * This function visually changes the add contact card to the edit contact card layout.
+ * It adds the "show" class for animation, changes the title to "Edit contact", and hides the subtitle.
+ */
+function redesignAddContactCardToEditContactCard() {
+    document.getElementById('addEditContact').classList.add('showAddEditContactContainer');
+    document.getElementById('addAndEditContactHeadline').innerHTML = 'Edit contact';
+    document.getElementById('addContactSubheadline').style.display = 'none';
+}
+
+/**
+ * This function populates the edit contact card with the details of the clicked contact.
+ * It sets the avatar background color and initials, fills the name, email, and phone input fields with the contact's data, 
+ * and sets focus on the name field after a short delay.
+ * @param {number} index - The index of the clicked contact in the `contacts` array.
+ */
+function showCurrentContactDetails(index) {
+    document.getElementById('avatarIcon').style.backgroundColor = `${localContacts[index]['avatarColor']}`;
+    document.getElementById('avatarIcon').innerHTML = `${localContacts[index]['initials']}`;
+    var inputNameField = document.getElementById('editContactName');
+    var nameToShow = `${localContacts[index]['name']} ${localContacts[index]['surname']}`;
+    inputNameField.value = nameToShow;
+    inputNameField.setSelectionRange(nameToShow.length, nameToShow.length);
+    document.getElementById('editContactEmail').value = localContacts[index]['email'];
+    document.getElementById('editContactPhone').value = localContacts[index]['phone'];
+    setTimeout(function () {
+        inputNameField.focus();
+    }, 125);
+}
+
+/**
+ * This function attempts to delete a contact at the specified index. Deletion is prevented
+ * if the contact's email matches the user's email.
+ *
+ * @param {number} index The index of the contact to delete in the `localContacts` array.
+ * @returns {Promise&lt;void>} A promise that resolves when the deletion process is complete.
+ */
+async function deleteContact(index) {
+    if (localContacts[index].email === userEmail) {
+        alert('The user cannot delete themselves from their own contact list.');
+    } else {
+        changeContactButtonColorAsClicked(index);
+        localContacts.splice(index, 1);
+        await updateUserContactsInRemote();
+        hideAddContactCard();
+        await initContacts();
+        hideContactEditDeleteMenu();
+        closeContactInfo();
+        clickedButtons = [];
+    }
+}
+
+/**
+ * This function hides the edit and delete menu container by removing the corresponding class.
+ */
+function hideContactEditDeleteMenu() {
+    document.getElementById('editContactMenuContainer').classList.remove('showEditContactMenu');
+}
+
+/**
+ * This function updates an existing contact at the specified index. It checks if all required
+ * fields (name, email, phone) are filled before updating.
+ *
+ * @param {number} index The index of the contact to update in the `localContacts` array.
+ * @returns {Promise&lt;void>} A promise that resolves when the update process is complete.
+ */
+async function updateContact(index) {
+    let contactData = getContactData();
+    if (contactData.name &amp;&amp; contactData.email &amp;&amp; contactData.phone) {
+        let formattedName = formatContactName(contactData);
+        let existingContact = localContacts[index];
+        localContacts[index] = createNewContactDataSet(contactData, formattedName, existingContact);
+        hideAddContactCard();
+        await initContacts();
+        let contactIndex = getIndexByNameSurname(localContacts, formattedName.firstName, formattedName.lastName);
+        openContactInfo(contactIndex);
+        clearAddContactForm();
+    } else {
+        alert("Please fill out every input field.");
+    }
+    await updateUserContactsInRemote();
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#CreatedPopUpOptions">CreatedPopUpOptions</a></li><li><a href="global.html#EditTemplate">EditTemplate</a></li><li><a href="global.html#NoMatchFound">NoMatchFound</a></li><li><a href="global.html#SubtaskStatus">SubtaskStatus</a></li><li><a href="global.html#TaskCadBigTemplate">TaskCadBigTemplate</a></li><li><a href="global.html#TaskTextInEdit">TaskTextInEdit</a></li><li><a href="global.html#TemplateGreetMobile">TemplateGreetMobile</a></li><li><a href="global.html#TemplateSubtaskProgressbar">TemplateSubtaskProgressbar</a></li><li><a href="global.html#Templates">Templates</a></li><li><a href="global.html#UpdateTaskInRemote">UpdateTaskInRemote</a></li><li><a href="global.html#UserInitals">UserInitals</a></li><li><a href="global.html#addContactButtonsCancelAndCreateButtonsHTMLTemplate">addContactButtonsCancelAndCreateButtonsHTMLTemplate</a></li><li><a href="global.html#addTaskInit">addTaskInit</a></li><li><a href="global.html#addTaskToBoard">addTaskToBoard</a></li><li><a href="global.html#addUser">addUser</a></li><li><a href="global.html#allowDrop">allowDrop</a></li><li><a href="global.html#assignedInitals">assignedInitals</a></li><li><a href="global.html#assingContact">assingContact</a></li><li><a href="global.html#bigCard">bigCard</a></li><li><a href="global.html#bigCardAssigned">bigCardAssigned</a></li><li><a href="global.html#bigCardAssignedTemplate">bigCardAssignedTemplate</a></li><li><a href="global.html#bigCardSubtaskTemplate">bigCardSubtaskTemplate</a></li><li><a href="global.html#bigCardSubtasks">bigCardSubtasks</a></li><li><a href="global.html#bigCardSubtasksCheck">bigCardSubtasksCheck</a></li><li><a href="global.html#boardPlace">boardPlace</a></li><li><a href="global.html#boardPopupAddTask">boardPopupAddTask</a></li><li><a href="global.html#boardPopupAddTaskWindow">boardPopupAddTaskWindow</a></li><li><a href="global.html#boardTaskNumber">boardTaskNumber</a></li><li><a href="global.html#buildTemplateForArrayInput">buildTemplateForArrayInput</a></li><li><a href="global.html#capitalizeFirstLetter">capitalizeFirstLetter</a></li><li><a href="global.html#cardTemplate">cardTemplate</a></li><li><a href="global.html#cards">cards</a></li><li><a href="global.html#changeBackCheckBoxStyle">changeBackCheckBoxStyle</a></li><li><a href="global.html#changeCheckBoxStyle">changeCheckBoxStyle</a></li><li><a href="global.html#changeContactButtonColorAsClicked">changeContactButtonColorAsClicked</a></li><li><a href="global.html#changeContactButtonEmailColorToWhite">changeContactButtonEmailColorToWhite</a></li><li><a href="global.html#changeLockIcon">changeLockIcon</a></li><li><a href="global.html#changeNavigation">changeNavigation</a></li><li><a href="global.html#changeNavigationAddTask">changeNavigationAddTask</a></li><li><a href="global.html#changeNavigationHighlightSummary">changeNavigationHighlightSummary</a></li><li><a href="global.html#changeNavigationPrivacyPolicy">changeNavigationPrivacyPolicy</a></li><li><a href="global.html#changePriorityColor">changePriorityColor</a></li><li><a href="global.html#checkAssignContact">checkAssignContact</a></li><li><a href="global.html#checkCards">checkCards</a></li><li><a href="global.html#checkErrors">checkErrors</a></li><li><a href="global.html#checkForDuplicateEmail">checkForDuplicateEmail</a></li><li><a href="global.html#checkIfEmailExists">checkIfEmailExists</a></li><li><a href="global.html#checkIfUserIsAddedAsContact">checkIfUserIsAddedAsContact</a></li><li><a href="global.html#checkInputValue">checkInputValue</a></li><li><a href="global.html#checkPasswordStrength">checkPasswordStrength</a></li><li><a href="global.html#checkPrivacyPolicy">checkPrivacyPolicy</a></li><li><a href="global.html#clearAddContactForm">clearAddContactForm</a></li><li><a href="global.html#clearPasswordError">clearPasswordError</a></li><li><a href="global.html#clearSubtaskInputField">clearSubtaskInputField</a></li><li><a href="global.html#clickedButtonEmailColors">clickedButtonEmailColors</a></li><li><a href="global.html#clickedButtons">clickedButtons</a></li><li><a href="global.html#clickedLegalPart">clickedLegalPart</a></li><li><a href="global.html#closeAssignToDropdown">closeAssignToDropdown</a></li><li><a href="global.html#closeCard">closeCard</a></li><li><a href="global.html#closeContactInfo">closeContactInfo</a></li><li><a href="global.html#closeDropdowenTask">closeDropdowenTask</a></li><li><a href="global.html#closeDropdown">closeDropdown</a></li><li><a href="global.html#closeTaskCategoryDropdown">closeTaskCategoryDropdown</a></li><li><a href="global.html#createCardObject">createCardObject</a></li><li><a href="global.html#createCategories">createCategories</a></li><li><a href="global.html#createContact">createContact</a></li><li><a href="global.html#createNewContactDataSet">createNewContactDataSet</a></li><li><a href="global.html#createTask">createTask</a></li><li><a href="global.html#createUserAsContact">createUserAsContact</a></li><li><a href="global.html#currentDraggedElement">currentDraggedElement</a></li><li><a href="global.html#deleteContact">deleteContact</a></li><li><a href="global.html#deleteCreatedSubtask">deleteCreatedSubtask</a></li><li><a href="global.html#deleteTask">deleteTask</a></li><li><a href="global.html#deleteUneditTask">deleteUneditTask</a></li><li><a href="global.html#displayClosestDueDate">displayClosestDueDate</a></li><li><a href="global.html#doNotClose">doNotClose</a></li><li><a href="global.html#doneCardUpdate">doneCardUpdate</a></li><li><a href="global.html#doneNumber">doneNumber</a></li><li><a href="global.html#drop">drop</a></li><li><a href="global.html#dropMobile">dropMobile</a></li><li><a href="global.html#dropdowenTask">dropdowenTask</a></li><li><a href="global.html#dropdownHelp">dropdownHelp</a></li><li><a href="global.html#dropdownLegalNotice">dropdownLegalNotice</a></li><li><a href="global.html#dropdownPrivacyPolicy">dropdownPrivacyPolicy</a></li><li><a href="global.html#editContactDeleteAndSaveButtonLayoutHTMLTemplate">editContactDeleteAndSaveButtonLayoutHTMLTemplate</a></li><li><a href="global.html#editCreatedSubtask">editCreatedSubtask</a></li><li><a href="global.html#editTask">editTask</a></li><li><a href="global.html#editTaskDone">editTaskDone</a></li><li><a href="global.html#emptyArrays">emptyArrays</a></li><li><a href="global.html#errorMessageIfEmptyCategory">errorMessageIfEmptyCategory</a></li><li><a href="global.html#errorMessageIfEmptyDueDate">errorMessageIfEmptyDueDate</a></li><li><a href="global.html#errorMessageIfEmptyTitle">errorMessageIfEmptyTitle</a></li><li><a href="global.html#feedbackCardUpdate">feedbackCardUpdate</a></li><li><a href="global.html#feedbackNumber">feedbackNumber</a></li><li><a href="global.html#formatContactName">formatContactName</a></li><li><a href="global.html#formatDueDate">formatDueDate</a></li><li><a href="global.html#getCategoryColor">getCategoryColor</a></li><li><a href="global.html#getContactData">getContactData</a></li><li><a href="global.html#getContactRelatedInfo">getContactRelatedInfo</a></li><li><a href="global.html#getIndexByNameSurname">getIndexByNameSurname</a></li><li><a href="global.html#getOldestOverdueDate">getOldestOverdueDate</a></li><li><a href="global.html#getPriorityImagePath">getPriorityImagePath</a></li><li><a href="global.html#getQueryParam">getQueryParam</a></li><li><a href="global.html#getSelectedContact">getSelectedContact</a></li><li><a href="global.html#getTaskData">getTaskData</a></li><li><a href="global.html#giveId">giveId</a></li><li><a href="global.html#goBack">goBack</a></li><li><a href="global.html#greetUser">greetUser</a></li><li><a href="global.html#greetUserMobile">greetUserMobile</a></li><li><a href="global.html#guestLogin">guestLogin</a></li><li><a href="global.html#handleContactAssignment">handleContactAssignment</a></li><li><a href="global.html#handleRememberMeChange">handleRememberMeChange</a></li><li><a href="global.html#hideAddContactCard">hideAddContactCard</a></li><li><a href="global.html#hideContactEditDeleteMenu">hideContactEditDeleteMenu</a></li><li><a href="global.html#highlightCreatedContact">highlightCreatedContact</a></li><li><a href="global.html#highlightErrorMessage">highlightErrorMessage</a></li><li><a href="global.html#includeAddTask">includeAddTask</a></li><li><a href="global.html#includeHTML">includeHTML</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initContacts">initContacts</a></li><li><a href="global.html#insertAnimation">insertAnimation</a></li><li><a href="global.html#isAssignedEdit">isAssignedEdit</a></li><li><a href="global.html#legalNoticeHiglite">legalNoticeHiglite</a></li><li><a href="global.html#loadAddTasks">loadAddTasks</a></li><li><a href="global.html#loadBoard">loadBoard</a></li><li><a href="global.html#loadContacts">loadContacts</a></li><li><a href="global.html#loadRememberedPassword">loadRememberedPassword</a></li><li><a href="global.html#loadRemoteContactsOfLoggedInUser">loadRemoteContactsOfLoggedInUser</a></li><li><a href="global.html#loadTasks">loadTasks</a></li><li><a href="global.html#loadUsers">loadUsers</a></li><li><a href="global.html#login">login</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#lowPriorityButtonStylingWhenClicked">lowPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#matchingCategoryCheck">matchingCategoryCheck</a></li><li><a href="global.html#mediumPriorityButtonStylingWhenClicked">mediumPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#mobileGreeting">mobileGreeting</a></li><li><a href="global.html#navigateTo">navigateTo</a></li><li><a href="global.html#navigationClick">navigationClick</a></li><li><a href="global.html#navigationClickImg">navigationClickImg</a></li><li><a href="global.html#newContactDataSetForArray">newContactDataSetForArray</a></li><li><a href="global.html#openAssignToDropdown">openAssignToDropdown</a></li><li><a href="global.html#openContactInfo">openContactInfo</a></li><li><a href="global.html#openContactInfoHTMLTemplate">openContactInfoHTMLTemplate</a></li><li><a href="global.html#openCreatedSubtaskBox">openCreatedSubtaskBox</a></li><li><a href="global.html#openDropdown">openDropdown</a></li><li><a href="global.html#openTaskCategoryDropdown">openTaskCategoryDropdown</a></li><li><a href="global.html#outputDeadlineText">outputDeadlineText</a></li><li><a href="global.html#outputDueDate">outputDueDate</a></li><li><a href="global.html#priorityEdit">priorityEdit</a></li><li><a href="global.html#priorityImgCheck">priorityImgCheck</a></li><li><a href="global.html#privacyPolicyHighlight">privacyPolicyHighlight</a></li><li><a href="global.html#progressCardUpdate">progressCardUpdate</a></li><li><a href="global.html#progressNumber">progressNumber</a></li><li><a href="global.html#progressbarCompetedRate">progressbarCompetedRate</a></li><li><a href="global.html#redesignAddContactCardToEditContactCard">redesignAddContactCardToEditContactCard</a></li><li><a href="global.html#rememberPassword">rememberPassword</a></li><li><a href="global.html#removeClickedLegalPart">removeClickedLegalPart</a></li><li><a href="global.html#removeNavHighlightLegalPartOnDropdown">removeNavHighlightLegalPartOnDropdown</a></li><li><a href="global.html#removeNavHighlightOnDropdown">removeNavHighlightOnDropdown</a></li><li><a href="global.html#removeNavigationClick">removeNavigationClick</a></li><li><a href="global.html#renderAddContactLayout">renderAddContactLayout</a></li><li><a href="global.html#renderAllContacts">renderAllContacts</a></li><li><a href="global.html#renderContactCategory">renderContactCategory</a></li><li><a href="global.html#renderContactCategoryAndEachContact">renderContactCategoryAndEachContact</a></li><li><a href="global.html#renderContactList">renderContactList</a></li><li><a href="global.html#renderEachContact">renderEachContact</a></li><li><a href="global.html#renderFilteredContacts">renderFilteredContacts</a></li><li><a href="global.html#resetAddTaskForm">resetAddTaskForm</a></li><li><a href="global.html#resetContactButtonColor">resetContactButtonColor</a></li><li><a href="global.html#resetContactButtonEmailColor">resetContactButtonEmailColor</a></li><li><a href="global.html#resetCreateTaskFormInputs">resetCreateTaskFormInputs</a></li><li><a href="global.html#resetLastClickedContactButtonColor">resetLastClickedContactButtonColor</a></li><li><a href="global.html#resetLastClickedContactButtonEmailColor">resetLastClickedContactButtonEmailColor</a></li><li><a href="global.html#resetNavigationItems">resetNavigationItems</a></li><li><a href="global.html#resetOtherPriorityButtonStyles">resetOtherPriorityButtonStyles</a></li><li><a href="global.html#saveEditSubtaskInput">saveEditSubtaskInput</a></li><li><a href="global.html#saveNewUser">saveNewUser</a></li><li><a href="global.html#saveSubtaskInput">saveSubtaskInput</a></li><li><a href="global.html#scrollDown">scrollDown</a></li><li><a href="global.html#scrollToAnchor">scrollToAnchor</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchContactToAssign">searchContactToAssign</a></li><li><a href="global.html#selectTaskCategory">selectTaskCategory</a></li><li><a href="global.html#separateCards">separateCards</a></li><li><a href="global.html#setButtonColorAsClicked">setButtonColorAsClicked</a></li><li><a href="global.html#setEmailColorAsClicked">setEmailColorAsClicked</a></li><li><a href="global.html#setGuestLogin">setGuestLogin</a></li><li><a href="global.html#setUserLogin">setUserLogin</a></li><li><a href="global.html#showAddContactCard">showAddContactCard</a></li><li><a href="global.html#showAvatarsOfSelectedContacts">showAvatarsOfSelectedContacts</a></li><li><a href="global.html#showContactCreatedPopUp">showContactCreatedPopUp</a></li><li><a href="global.html#showContactEditDeleteMenu">showContactEditDeleteMenu</a></li><li><a href="global.html#showCurrentContactDetails">showCurrentContactDetails</a></li><li><a href="global.html#showEditAndDeleteMenuOnMobile">showEditAndDeleteMenuOnMobile</a></li><li><a href="global.html#showEditContact">showEditContact</a></li><li><a href="global.html#showTaskCreatedPopUp">showTaskCreatedPopUp</a></li><li><a href="global.html#showTaskCreatedPopUpBoard">showTaskCreatedPopUpBoard</a></li><li><a href="global.html#sortByFirstName">sortByFirstName</a></li><li><a href="global.html#sortUpcomingCards">sortUpcomingCards</a></li><li><a href="global.html#startAnimation">startAnimation</a></li><li><a href="global.html#startDragging">startDragging</a></li><li><a href="global.html#subtaskCompleted">subtaskCompleted</a></li><li><a href="global.html#subtaskEdit">subtaskEdit</a></li><li><a href="global.html#subtaskNotCompleted">subtaskNotCompleted</a></li><li><a href="global.html#successfulLogin">successfulLogin</a></li><li><a href="global.html#successfulSignup">successfulSignup</a></li><li><a href="global.html#summaryLoad">summaryLoad</a></li><li><a href="global.html#summaryLoadNumbers">summaryLoadNumbers</a></li><li><a href="global.html#templateOkBtn">templateOkBtn</a></li><li><a href="global.html#todoCardUpdate">todoCardUpdate</a></li><li><a href="global.html#todoNumber">todoNumber</a></li><li><a href="global.html#toggleAssignToDropdown">toggleAssignToDropdown</a></li><li><a href="global.html#toggleCheckbox">toggleCheckbox</a></li><li><a href="global.html#toggleContactButtonColor">toggleContactButtonColor</a></li><li><a href="global.html#toggleContactButtonEmailColor">toggleContactButtonEmailColor</a></li><li><a href="global.html#toggleIndex">toggleIndex</a></li><li><a href="global.html#togglePassword">togglePassword</a></li><li><a href="global.html#togglePrivacyPolicyCheckbox">togglePrivacyPolicyCheckbox</a></li><li><a href="global.html#toggleRememberMeCheckbox">toggleRememberMeCheckbox</a></li><li><a href="global.html#toggleSelectTaskCategoryDropdown">toggleSelectTaskCategoryDropdown</a></li><li><a href="global.html#uncheckAssignContact">uncheckAssignContact</a></li><li><a href="global.html#unclickCreatedContact">unclickCreatedContact</a></li><li><a href="global.html#updateCards">updateCards</a></li><li><a href="global.html#updateContact">updateContact</a></li><li><a href="global.html#updateDueDateContainers">updateDueDateContainers</a></li><li><a href="global.html#updateUserContactsInRemote">updateUserContactsInRemote</a></li><li><a href="global.html#updateUserContactsInRemoteAfterRegistration">updateUserContactsInRemoteAfterRegistration</a></li><li><a href="global.html#urgentButtonColor">urgentButtonColor</a></li><li><a href="global.html#urgentNumber">urgentNumber</a></li><li><a href="global.html#urgentPriorityButtonStylingWhenClicked">urgentPriorityButtonStylingWhenClicked</a></li><li><a href="global.html#validateConfirmedPassword">validateConfirmedPassword</a></li><li><a href="global.html#validateEmailAddress">validateEmailAddress</a></li><li><a href="global.html#validateFormFields">validateFormFields</a></li><li><a href="global.html#validateTaskData">validateTaskData</a></li><li><a href="global.html#wrongPasswordMessage">wrongPasswordMessage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Tue May 07 2024 10:05:37 GMT+0200 (Mitteleuropäische Sommerzeit)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

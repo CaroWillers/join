@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOIN</title>
+    <link rel="icon" type="image/vnd.icon" href="../img/join.ico">
+    <link rel="stylesheet" href="./Stylesheets/style.css">
+    <link rel="stylesheet" href="./Stylesheets/board.css">
+    <link rel="stylesheet" href="./Stylesheets/summary.css">
+    <link rel="stylesheet" href="./Stylesheets/register.css">
+    <link rel="stylesheet" href="./Stylesheets/addTask.css">
+    <link rel="stylesheet" href="./Stylesheets/contacts.css">
+    <script src="./JS/script.js"></script>
+    <script src="./JS/summary.js"></script>
+    <script src="./JS/contacts_part1.js"></script>
+    <script src="./JS/contacts_part2.js"></script>
+    <script src="./JS/privacyAndLegal.js"></script>
+    <script src="./JS/signup.js"></script>
+    <script src="./JS/login.js"></script>
+    <script src="./JS/storage.js"></script>
+    <script src="./JS/addTask_part1.js"></script>
+    <script src="./JS/addTask_part2.js"></script>
+    <script src="./JS/board_part1.js"></script>
+    <script src="./JS/board_part2.js"></script>
+    <script src="./JS/templates.js"></script>
+    <link rel="stylesheet" href="./fonts/fonts.css">
+</head>  
+<!-- login page (after start animation) -->
+<main class="mainLoginContainer">
+    <div class="loginHeader">
+        <img src="./img/logo.png">
+    </div>    
+    <div id="loginPage" class="loginPage">
+        <div class="loginContainer">
+            <div class="loginHeadline">
+                <h1 class="h1Login">Log in</h1>
+                <div class="seperator"></div>
+            </div>
+            <form class="loginForm" onsubmit="login(); return false;">
+                <div class="inputField">
+                    <input class="input user-email" type="email" required id="email" placeholder="Email"
+                        autocomplete="email" onkeyup="loadRememberedPassword()">
+                    <img class="inputImage" src="./img/mail.svg">
+                </div>
+                <div class="inputField">
+                    <input class="input" type="password" required id="password" placeholder="Password"
+                        autocomplete="current-password" onfocus="changeLockIcon(this)">
+                    <img class="inputImage" id="passwordIcon" src="./img/lock.svg"
+                        onclick="togglePassword('password')">
+                </div>
+                <div id="passwordError" class="passwordError">Wrong password! Try again.</div>
+                <div class="loginCheckboxContainer">
+                    <label>
+                        <input type="checkbox" id="rememberCheckbox" class="hiddenCheckbox"
+                            onchange="toggleRememberMeCheckbox(this); handleRememberMeChange();">
+                        <img class="checkboxImage" src="./img/Rectangle5.svg" data-checked="./img/checked.svg"
+                            data-unchecked="./img/Rectangle5.svg">
+                        <span>Remember me</span>
+                    </label>
+                </div>
+                <div class="buttonContainer">
+                    <button type="submit" class="blueBtn">Log in</button>
+                    <button type="button" onclick="guestLogin()" class="greyBorderBtn">Guest log in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="noJoinUser">
+        <span>Not a Join User?</span>
+        <button class="blueBtn" onclick="window.location.href='../signup.html'">Sign up</button>
+    </div>
+    <div class="legalNotes">
+        <button onclick="window.location.href='../privacyPolicyLogin.html?ref=login'">Privacy Policy</button>
+        <button onclick="window.location.href='../legalNoticeLogin.html?ref=login'">Legal Notice</button>
+    </div>    
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <p>Welcome! You're logged in.</p>
+        </div>
+    </div>
+    </div>
+</main>
+</html>

@@ -1,0 +1,69 @@
+<div class="wraper-board">
+    <div class="board-top">
+
+        <div class="search-field">
+            <input oninput="search()" id="search" class="search-input" type="text" placeholder="Find Task">
+            <div class="search-boder"></div>
+            <div class="search-btn-container" onclick="search()">
+                <img class="search-btn-normal" src="./img/search btn.svg" alt="">
+                <img class="search-btn-hover" src="./img/search button hover.svg" alt="">
+                <img class="search-btn-click" src="./img/search button clicked.svg" alt="">
+            </div> 
+        </div>
+        <button class="blueBtn add-btn-top" onclick="boardPopupAddTask() ">Add task <img src="./img/plus icon.svg" alt=""></button>
+    </div>
+    <div id="no-search-results"></div>
+    <div class="kanban-board">
+        <div class="board-collum">
+            <div class="board-header">
+                <h3>To do</h3>
+                <div class="add-btn-container" onclick="openAddTaskSmallBtnBoard('todo')">
+                    <img class="add-btn-board" src="./img/plus button.svg" alt="plus icon">
+                    <img class="add-btn-board-hover" src="./img/plus buton hover.svg" alt="plus icon">
+                    <img class="add-btn-board-click" src="./img/plus button clicked.svg" alt="plus icon">
+                </div>
+            </div>
+            <div id="todo" class="card-container" ondrop="drop('todo')" ondragover="allowDrop(event)">
+               <div class="no-task-div">No tasks To do</div> 
+            </div>
+            
+        </div>
+        <div class="board-collum">
+            <div class="board-header">
+                <h3>In progress</h3>
+                <div class="add-btn-container" onclick="openAddTaskSmallBtnBoard('progress')">
+                    <img class="add-btn-board" src="./img/plus button.svg" alt="plus icon">
+                    <img class="add-btn-board-hover" src="./img/plus buton hover.svg" alt="plus icon">
+                    <img class="add-btn-board-click" src="./img/plus button clicked.svg" alt="plus icon">
+                </div>
+            </div>
+            <div id="progress" class="card-container" ondrop="drop('progress')" ondragover="allowDrop(event)">
+                <div class="no-task-div">No tasks in progress</div>
+            </div>
+        </div>
+        <div class="board-collum">
+            <div class="board-header">
+                <h3>Await feedback</h3>
+                <div class="add-btn-container" onclick="openAddTaskSmallBtnBoard('feedback')">
+                    <img class="add-btn-board" src="./img/plus button.svg" alt="plus icon">
+                    <img class="add-btn-board-hover" src="./img/plus buton hover.svg" alt="plus icon">
+                    <img class="add-btn-board-click" src="./img/plus button clicked.svg" alt="plus icon">
+                </div>
+            </div>
+            <div id="feedback" class="card-container" ondrop="drop('feedback')" ondragover="allowDrop(event)">
+                <div class="no-task-div">No tasks feedback</div>
+            </div>
+
+        </div>
+        <div class="board-collum">
+            <div class="board-header">
+                <h3>Done</h3>
+            </div>
+            <div id="done" class="card-container" ondrop="drop('done')" ondragover="allowDrop(event)">
+                <div class="no-task-div">No tasks done</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
